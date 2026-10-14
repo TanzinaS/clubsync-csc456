@@ -1,11 +1,3 @@
-# Sample Data
-
-Fake data for development and testing while the backend and database are being built.
-
-- `sample_clubs.json` — example clubs
-- `sample_events.json` — example events; `club_id` links each event to a club
-
-**All entries are fictional placeholders**, not real CCNY clubs or events.
 
 ## Draft Fields
 

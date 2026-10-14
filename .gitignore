@@ -1,0 +1,42 @@
+# ---- Secrets and environment variables ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+client_secret*.json
+token*.json
+
+# ---- Operating system files ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Editors / IDEs ----
+.vscode/
+.idea/
+*.swp
+
+# ---- Python (if used) ----
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+.pytest_cache/
+
+# ---- JavaScript / Node (if used) ----
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ---- Build output ----
+dist/
+build/
+coverage/
+
+# ---- Logs and local databases ----
+*.log
+*.sqlite3
+*.db

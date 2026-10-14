@@ -1,0 +1,42 @@
+[
+  {
+    "id": 101,
+    "club_id": 1,
+    "title": "Intro to Git Workshop",
+    "description": "Placeholder event. Learn the basics of Git and GitHub.",
+    "start_time": "2026-10-20T12:30:00-04:00",
+    "end_time": "2026-10-20T14:00:00-04:00",
+    "location": "Sample Room 101",
+    "tags": ["workshop", "beginner"]
+  },
+  {
+    "id": 102,
+    "club_id": 2,
+    "title": "Campus Photo Walk",
+    "description": "Placeholder event. Bring any camera or phone.",
+    "start_time": "2026-10-22T15:00:00-04:00",
+    "end_time": "2026-10-22T16:30:00-04:00",
+    "location": "Sample Meeting Point",
+    "tags": ["outdoors", "social"]
+  },
+  {
+    "id": 103,
+    "club_id": 3,
+    "title": "Fall Chess Tournament",
+    "description": "Placeholder event. All skill levels welcome.",
+    "start_time": "2026-10-24T13:00:00-04:00",
+    "end_time": "2026-10-24T17:00:00-04:00",
+    "location": "Sample Room 202",
+    "tags": ["competition"]
+  },
+  {
+    "id": 104,
+    "club_id": 1,
+    "title": "Hack Night",
+    "description": "Placeholder event. Work on personal projects with other students.",
+    "start_time": "2026-10-27T18:00:00-04:00",
+    "end_time": "2026-10-27T20:00:00-04:00",
+    "location": "Sample Room 101",
+    "tags": ["social", "coding"]
+  }
+]

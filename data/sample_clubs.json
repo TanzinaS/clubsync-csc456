@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Sample Coding Club",
+    "category": "Technology",
+    "description": "Placeholder club for testing. Weekly coding sessions and workshops.",
+    "contact_email": "coding-club@example.com"
+  },
+  {
+    "id": 2,
+    "name": "Sample Photography Society",
+    "category": "Arts",
+    "description": "Placeholder club for testing. Photo walks and editing nights.",
+    "contact_email": "photo-society@example.com"
+  },
+  {
+    "id": 3,
+    "name": "Sample Chess Club",
+    "category": "Recreation",
+    "description": "Placeholder club for testing. Casual games and tournaments.",
+    "contact_email": "chess-club@example.com"
+  }
+]

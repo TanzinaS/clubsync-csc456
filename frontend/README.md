@@ -14,12 +14,6 @@ The user interface for ClubSync — everything students see and interact with.
 | `src/services/` | Code that requests data from the backend | Fetching events, fetching clubs |
 | `src/styles/` | Stylesheets and shared colors/fonts | Global styles, layout |
 
-## Sprint 1 Tasks
-
-- Landing page and navigation (5 hrs)
-- Events feed (6 hrs)
-- Calendar view (6 hrs)
-
 ## Working Without the Backend
 
 Until the backend API exists, use the sample data in `/data` (`sample_clubs.json`, `sample_events.json`). Keep data loading inside `src/services/` so switching to the real API later only requires changes in one place.

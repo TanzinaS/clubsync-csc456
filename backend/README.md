@@ -6,7 +6,7 @@ Server-side code for ClubSync: API endpoints, data handling, authentication, and
 **Framework:** Not confirmed. Python/Flask has been suggested.
 **Database:** Not decided.
 
-Specific responsibilities are still being finalized. Once assigned, they will be listed in `docs/team-roles.md`.
+Individual responsibilities will be listed in the root README once finalized.
 
 ## Folders
 
@@ -16,13 +16,6 @@ Specific responsibilities are still being finalized. Once assigned, they will be
 | `models/` | Definitions of data and database tables | Club, Event, User |
 | `services/` | Business logic, kept separate from routes | Filtering events by club, building a user's calendar |
 | `integrations/` | Code that talks to outside services | Google Calendar (planned) |
-
-## Areas of Work
-
-- API and server logic
-- Database design and management
-- User authentication (planned)
-- External integrations, e.g. Google Calendar (planned)
 
 ## Configuration and Secrets
 

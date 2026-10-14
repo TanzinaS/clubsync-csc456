@@ -3,99 +3,87 @@
 ClubSync is a web application that helps CCNY students discover campus club events and keep track of them in a personalized calendar.
 
 **Course:** CSC 456 — Topics in Software Engineering
-**Status:** Sprint 1 — project setup and early development
+
+> This README describes the project and how the repository is organized. It is only updated for major changes.
+> - **Feature status:** [FEATURES.md](FEATURES.md)
+> - **Tasks, bugs, and sprints:** GitHub Projects board *(link to be added)*
+> - **How to contribute:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
 
+## The Problem
+
+CCNY club events are announced across flyers, emails, social media, and word of mouth. Students easily miss events they would care about, and there is no single place to see them alongside their own schedule.
+
 ## Goals
 
-- Make it easy for students to find clubs and events they care about.
-- Bring club events into one place instead of scattered flyers, emails, and social posts.
+- Make it easy for students to discover clubs and their events.
+- Bring club events into one place.
 - Let students build a personal calendar from the clubs and events they choose.
-- Practice a real team software engineering workflow: issues, branches, pull requests, code review, testing, and deployment.
+- Practice a real team workflow: issues, branches, pull requests, code review, testing, and deployment.
 
-## Proposed Features
-
-| Feature | Status |
-|---|---|
-| Landing page and navigation | Sprint 1 |
-| Club discovery and selection | Planned |
-| Events feed | Sprint 1 |
-| Personalized calendar view | Sprint 1 |
-| Club-specific pages | Planned |
-| User authentication | Planned |
-| Google Calendar integration | Planned |
-| RSVP functionality | Not yet confirmed |
+**Primary users:** CCNY students looking for club events.
 
 ## Team
 
-| Member | Role |
-|---|---|
-| Tanzina | Project Manager, GitHub Manager, Code Review, Integration, Deployment |
-| Denisa | Frontend Developer |
-| Sangita | Backend Developer |
-| Sarinda | Backend Developer |
-| Yazmyrat | Backend Developer |
-| Ayman | Quality Assurance (QA) |
+| Member | Role | Responsibilities |
+|---|---|---|
+| Tanzina | Project Manager, GitHub Manager | Sprint planning, GitHub Projects and Issues, code review, integration, deployment |
+| Denisa | Frontend Developer | User interface (`frontend/`) |
+| Sangita | Backend Developer | Backend (`backend/`) |
+| Sarinda | Backend Developer | Backend (`backend/`) |
+| Yazmyrat | Backend Developer | Backend (`backend/`) |
+| Ayman | Quality Assurance | Test plans, testing, bug reports (`tests/`) |
 
-See [docs/team-roles.md](docs/team-roles.md) for more detail.
+The backend team collaborates on API/server logic, database management, authentication, and external integrations. Individual backend areas will be listed here once finalized.
+
+## Technology Stack
+
+| Area | Decision |
+|---|---|
+| Frontend framework | Not decided |
+| Backend framework | Not decided (Python/Flask suggested) |
+| Database | Not decided |
+| Deployment platform | Not decided |
+
+When the team makes a decision, update this table and add setup instructions below.
+
+## Setup
+
+Setup instructions will be added once the technology stack is chosen.
 
 ## Repository Structure
 
 ```text
 ClubSync/
 ├── .github/            Issue and pull request templates
-├── frontend/           User interface code (Denisa)
+├── frontend/           User interface code
 │   └── src/
 │       ├── components/ Reusable UI pieces (navbar, event card, etc.)
 │       ├── pages/      Full screens (landing, events feed, calendar, club page)
 │       ├── services/   Code that talks to the backend API
 │       └── styles/     Stylesheets and shared design values
-├── backend/            Server code (Sangita, Sarinda, Yazmyrat)
+├── backend/            Server code
 │   ├── api/            Routes / endpoints the frontend calls
 │   ├── models/         Data structures and database models
 │   ├── services/       Business logic (filtering events, building calendars)
 │   └── integrations/   External services (e.g., Google Calendar)
-├── data/               Sample JSON data for development and testing
-├── tests/              Test plans and automated tests (Ayman + developers)
-├── docs/               Project documentation, sprint notes, decisions
+├── data/               Fictional sample data for development and testing
+├── tests/              Test cases and automated tests
 ├── .gitignore
-├── CONTRIBUTING.md     How to contribute (branches, commits, pull requests)
+├── CONTRIBUTING.md     Branches, commits, pull requests
+├── FEATURES.md         Living list of features and their status
 └── README.md
 ```
 
-## Technology Stack
+## Workflow Summary
 
-**Not finalized.** The folder layout is intentionally framework-neutral.
-
-- Backend: Python/Flask has been suggested, not confirmed.
-- Frontend framework: not decided.
-- Database: not decided.
-- Deployment platform: not decided.
-
-Once the team decides, the choice will be recorded in [docs/decisions.md](docs/decisions.md) and setup instructions will be added to this README.
-
-## How to Contribute (Short Version)
-
-1. Pick or get assigned a GitHub Issue.
-2. Pull the latest `main`.
-3. Create a branch: `feature/short-description`.
-4. Make small, focused commits.
-5. Push your branch and open a pull request linked to the issue.
-6. Wait for review and approval before merging.
+1. Every task, bug, and sprint item lives on the GitHub Projects board.
+2. Create a branch from `main` (e.g., `feature/events-feed`).
+3. Open a pull request linked to the issue.
+4. Tanzina reviews and merges; Ayman tests.
 
 Full details: [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## Current Development Status
-
-- [x] Repository structure created
-- [x] Starter documentation written
-- [ ] Technology stack decided
-- [ ] Backend task assignments finalized
-- [ ] Landing page and navigation
-- [ ] Events feed
-- [ ] Calendar view
-- [ ] Sprint 1 report (due October 26, 2026)
 
 ## Security
 

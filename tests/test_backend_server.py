@@ -46,6 +46,16 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(clubs[1]["name"], "Robotics Club")
         self.assertEqual(clubs[2]["name"], "Photography Club")
 
+    def test_get_events(self):
+        response = self.client.get("/api/events")
+
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        self.assertEqual(len(events), 3)
+        self.assertEqual(events[0]["title"], "Computer Science Workshop")
+        self.assertEqual(events[1]["title"], "Robotics Competition")
+        self.assertEqual(events[2]["title"], "Photography Walk")
 
 
 if __name__ == "__main__":

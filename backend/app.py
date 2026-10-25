@@ -2,6 +2,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS 
 from api.clubs import clubs_bp
+from api.events import events_bp
 
 
 def create_app():
@@ -9,6 +10,7 @@ def create_app():
     CORS(app)
 
     app.register_blueprint(clubs_bp)
+    app.register_blueprint(events_bp)
 
     @app.get("/")
     def home():

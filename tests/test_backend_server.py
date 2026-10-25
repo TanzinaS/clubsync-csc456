@@ -35,6 +35,18 @@ class TestBackendServer(unittest.TestCase):
             "ok"
         )
 
+    def test_get_clubs(self):
+        response = self.client.get("/api/clubs")
+
+        self.assertEqual(response.status_code, 200)
+
+        clubs = response.get_json()
+        self.assertEqual(len(clubs), 3)
+        self.assertEqual(clubs[0]["name"], "Computer Science Club")
+        self.assertEqual(clubs[1]["name"], "Robotics Club")
+        self.assertEqual(clubs[2]["name"], "Photography Club")
+
+
 
 if __name__ == "__main__":
     unittest.main()

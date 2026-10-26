@@ -50,7 +50,40 @@ When the team makes a decision, update this table and add setup instructions bel
 
 ## Setup
 
-Setup instructions will be added once the technology stack is chosen.
+These steps run the current demo locally: a temporary "Coming Soon" page that checks it can reach the Flask backend. You need Python 3 installed. Use two terminal windows, both starting in the `ClubSync/` folder.
+
+### 1. Start the backend (Terminal 1)
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+flask --app app run --port 5001
+```
+
+The backend runs at http://localhost:5001. Check it by opening http://localhost:5001/api/health, which should show `"status": "ok"`.
+
+We use port 5001 because port 5000 is often taken by AirPlay Receiver on macOS.
+
+### 2. Start the frontend (Terminal 2)
+
+```bash
+cd frontend
+python3 -m http.server 8000
+```
+
+Open http://localhost:8000. The page should say **Backend Connected**. If it says **Backend Not Reachable**, make sure the backend from step 1 is still running.
+
+### 3. Run the tests
+
+From the `ClubSync/` folder, with the backend's virtual environment active:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Press `Ctrl+C` in each terminal to stop the servers.
 
 ## Repository Structure
 

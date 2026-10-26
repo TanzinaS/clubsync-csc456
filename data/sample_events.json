@@ -1,1 +1,146 @@
-
+[
+  {
+    "id": 1,
+    "club_id": 11,
+    "title": "Bachata Workshop for Beginners",
+    "description": "Find your rhythm with the Dominican Student Association. Learn the basics of bachata in a relaxed, beginner-friendly workshop. No partner or experience needed.",
+    "start_time": "2026-10-13T13:00:00-04:00",
+    "end_time": "2026-10-13T15:00:00-04:00",
+    "location": "NAC 6/221",
+    "tags": [
+      "Cultural"
+    ]
+  },
+  {
+    "id": 2,
+    "club_id": 12,
+    "title": "Public Debate: Should Tuition Freeze?",
+    "description": "Join an open conversation about the future of affordable education. Bring your perspective, listen to fellow students, and help shape the discussion.",
+    "start_time": "2026-10-14T14:00:00-04:00",
+    "end_time": "2026-10-14T16:00:00-04:00",
+    "location": "Shepard Hall 290",
+    "tags": [
+      "Academic"
+    ]
+  },
+  {
+    "id": 3,
+    "club_id": 6,
+    "title": "Build Night: Line-Following Bots",
+    "description": "Build a tiny robot with a big sense of direction. Work with a team to wire sensors and program a line-following bot. Materials provided; beginners welcome.",
+    "start_time": "2026-10-15T14:00:00-04:00",
+    "end_time": "2026-10-15T16:00:00-04:00",
+    "location": "Marshak 418 \u00b7 MakerLab",
+    "tags": [
+      "Tech"
+    ]
+  },
+  {
+    "id": 4,
+    "club_id": 13,
+    "title": "Friday Night Shabbat Dinner",
+    "description": "Close out the week with a warm meal, good conversation, and community. All students are welcome at the table.",
+    "start_time": "2026-10-16T18:00:00-04:00",
+    "end_time": "2026-10-16T20:00:00-04:00",
+    "location": "NAC 3/201",
+    "tags": [
+      "Faith"
+    ]
+  },
+  {
+    "id": 5,
+    "club_id": 14,
+    "title": "Saturday Scrimmage",
+    "description": "Lace up and join a friendly afternoon on the field. Bring water and comfortable shoes. We will sort out teams when everyone arrives.",
+    "start_time": "2026-10-17T11:00:00-04:00",
+    "end_time": "2026-10-17T13:00:00-04:00",
+    "location": "South Field",
+    "tags": [
+      "Sports"
+    ]
+  },
+  {
+    "id": 6,
+    "club_id": 4,
+    "title": "Golden Hour Photo Walk",
+    "description": "Explore the campus in the soft evening light. Bring any camera, including your phone, and discover a new way to see familiar places.",
+    "start_time": "2026-10-18T17:00:00-04:00",
+    "end_time": "2026-10-18T19:00:00-04:00",
+    "location": "Meet at Shepard Hall steps",
+    "tags": [
+      "Arts"
+    ]
+  },
+  {
+    "id": 7,
+    "club_id": 1,
+    "title": "Proofs & Pastries",
+    "description": "Take a study break with a fresh pastry and a satisfying math puzzle. Collaborate on proofs with fellow students at every level.",
+    "start_time": "2026-10-20T12:00:00-04:00",
+    "end_time": "2026-10-20T13:30:00-04:00",
+    "location": "NAC 4/120",
+    "tags": [
+      "Academic"
+    ]
+  },
+  {
+    "id": 8,
+    "club_id": 2,
+    "title": "Roblox Game Jam",
+    "description": "Dream up a small game, team up with other creators, and bring your idea to life in Roblox Studio. Bring a laptop if you can.",
+    "start_time": "2026-10-21T15:00:00-04:00",
+    "end_time": "2026-10-21T17:00:00-04:00",
+    "location": "NAC 1/301",
+    "tags": [
+      "Tech"
+    ]
+  },
+  {
+    "id": 9,
+    "club_id": 3,
+    "title": "Autumn Baking Social",
+    "description": "Share seasonal treats, swap favorite recipes, and meet the Baking Club. A cozy afternoon for curious beginners and practiced bakers alike.",
+    "start_time": "2026-10-22T16:00:00-04:00",
+    "end_time": "2026-10-22T18:00:00-04:00",
+    "location": "NAC Student Lounge",
+    "tags": [
+      "Social"
+    ]
+  },
+  {
+    "id": 10,
+    "club_id": 7,
+    "title": "Campus Garden: Plant & Give",
+    "description": "Help plant herbs and prepare seedlings for our neighborhood. Gloves and tools are provided. Come ready to get your hands a little muddy.",
+    "start_time": "2026-10-23T12:00:00-04:00",
+    "end_time": "2026-10-23T14:00:00-04:00",
+    "location": "Campus Community Garden",
+    "tags": [
+      "Community Service"
+    ]
+  },
+  {
+    "id": 11,
+    "club_id": 5,
+    "title": "An Evening Under the Stars",
+    "description": "Look up with Starlight Astronomy. Try a telescope, learn to spot constellations, and share your biggest questions about the universe.",
+    "start_time": "2026-10-24T19:00:00-04:00",
+    "end_time": "2026-10-24T21:00:00-04:00",
+    "location": "Marshak Plaza",
+    "tags": [
+      "Other"
+    ]
+  },
+  {
+    "id": 12,
+    "club_id": 10,
+    "title": "Stories Across Cultures",
+    "description": "Bring a short passage from a book you love. We will read, listen, and explore the stories that connect our campus community.",
+    "start_time": "2026-10-25T14:00:00-04:00",
+    "end_time": "2026-10-25T16:00:00-04:00",
+    "location": "Cohen Library \u00b7 Room 2",
+    "tags": [
+      "Cultural"
+    ]
+  }
+]

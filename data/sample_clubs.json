@@ -1,11 +1,11 @@
 [
-{
-  "id": 1,
-  "name": "Math Wizards",
-  "category": "Mathematics",
-  "description": "A club focused on solving math proofs.",
-  "contact_email": "contact@mathwizards.org"
-},
+  {
+    "id": 1,
+    "name": "Math Wizards",
+    "category": "Mathematics",
+    "description": "A club focused on solving math proofs.",
+    "contact_email": "contact@mathwizards.org"
+  },
   {
     "id": 2,
     "name": "Roblox Zone",
@@ -68,5 +68,33 @@
     "category": "Literature",
     "description": "Reading & debating popular modern fiction releases.",
     "contact_email": "contact@pageturners.org"
+  },
+  {
+    "id": 11,
+    "name": "Dominican Student Association",
+    "category": "Cultural",
+    "description": "Celebrate Dominican culture through music, dance, food, and community. Everyone is welcome.",
+    "contact_email": "hello@dsa.example"
+  },
+  {
+    "id": 12,
+    "name": "CCNY Debate Society",
+    "category": "Academic",
+    "description": "Big questions. Open minds. Find your voice through friendly debates and thoughtful conversation.",
+    "contact_email": "hello@debate.example"
+  },
+  {
+    "id": 13,
+    "name": "CCNY Hillel",
+    "category": "Faith",
+    "description": "A welcoming space for Jewish life, shared traditions, and Friday dinners on campus.",
+    "contact_email": "hello@hillel.example"
+  },
+  {
+    "id": 14,
+    "name": "CCNY Soccer Club",
+    "category": "Sports",
+    "description": "Meet us on the field for friendly scrimmages and a little healthy competition. All levels welcome.",
+    "contact_email": "hello@soccer.example"
   }
 ]

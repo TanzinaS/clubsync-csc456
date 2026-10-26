@@ -4,97 +4,97 @@
     "name": "Math Wizards",
     "category": "Mathematics",
     "description": "A club focused on solving math proofs.",
-    "contact_email": "contact@mathwizards.org"
+    "contact_email": "contact@mathwizards.example"
   },
   {
     "id": 2,
     "name": "Roblox Zone",
     "category": "Gaming",
     "description": "Robloxians unite!",
-    "contact_email": "contact@robloxclub.org"
+    "contact_email": "contact@robloxclub.example"
   },
   {
     "id": 3,
     "name": "Baking club ",
     "category": "Culinary arts",
     "description": "Come join us to learn how to bake various types of desserts!",
-    "contact_email": "contact@bakingclub.org"
+    "contact_email": "contact@bakingclub.example"
   },
   {
     "id": 4,
     "name": "Photography Club",
     "category": "Media",
     "description": "A community for hobbyists to learn new techniques.",
-    "contact_email": "contact@photographyclub.org "
+    "contact_email": "contact@photographyclub.example "
   },
   {
     "id": 5,
     "name": "Starlight Astronomy",
     "category": "Science",
     "description": "Amateur astronomers hosting dark-sky stargazing trips, telescope workshops, and space science discussions.",
-    "contact_email": "contact@starlightastronomy.org"
+    "contact_email": "contact@starlightastronomy.example"
   },
   {
     "id": 6,
     "name": "Robotics Club",
     "category": "Engineering",
     "description": "We design, build, & program robots!",
-    "contact_email": "contact@roboticsclub.org"
+    "contact_email": "contact@roboticsclub.example"
   },
   {
     "id": 7,
     "name": "Let it Bloom!",
     "category": "Gardening",
     "description": "Community gardeners dedicated to urban agriculture & seed sharing initiatives.",
-    "contact_email": "contact@letitbloom.org"
+    "contact_email": "contact@letitbloom.example"
   },
   {
     "id": 8,
     "name": "Climbers' Circle",
     "category": "Outdoor",
     "description": "We host monthly hiking events across the region!",
-    "contact_email": "contact@climberscircle.org"
+    "contact_email": "contact@climberscircle.example"
   },
   {
     "id": 9,
     "name": "Chess Club",
     "category": "Games",
     "description": "A casual & competitive chess community hosting weekly & monthly tournaments.",
-    "contact_email": "contact@chessclub.org"
+    "contact_email": "contact@chessclub.example"
   },
   {
     "id": 10,
     "name": "Page Turners",
     "category": "Literature",
     "description": "Reading & debating popular modern fiction releases.",
-    "contact_email": "contact@pageturners.org"
+    "contact_email": "contact@pageturners.example"
   },
   {
     "id": 11,
     "name": "Dominican Student Association",
     "category": "Cultural",
-    "description": "Celebrate Dominican culture through music, dance, food, and community. Everyone is welcome.",
+    "description": "Celebrate Dominican culture through music, dance, food, & community. Everyone is welcome.",
     "contact_email": "hello@dsa.example"
   },
   {
     "id": 12,
     "name": "CCNY Debate Society",
     "category": "Academic",
-    "description": "Big questions. Open minds. Find your voice through friendly debates and thoughtful conversation.",
+    "description": "Big questions. Open minds. Find your voice through friendly debates & thoughtful conversation.",
     "contact_email": "hello@debate.example"
   },
   {
     "id": 13,
     "name": "CCNY Hillel",
     "category": "Faith",
-    "description": "A welcoming space for Jewish life, shared traditions, and Friday dinners on campus.",
+    "description": "A welcoming space for Jewish life, shared traditions, & Friday dinners on campus.",
     "contact_email": "hello@hillel.example"
   },
   {
     "id": 14,
     "name": "CCNY Soccer Club",
     "category": "Sports",
-    "description": "Meet us on the field for friendly scrimmages and a little healthy competition. All levels welcome.",
+    "description": "Meet us on the field for friendly scrimmages & a little healthy competition. All levels welcome.",
     "contact_email": "hello@soccer.example"
   }
 ]

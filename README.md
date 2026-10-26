@@ -64,7 +64,7 @@ Open **http://127.0.0.1:5173** (or the local URL printed in your terminal). Stop
 
 The frontend loads `data/sample_events.json` and `data/sample_clubs.json` directly. No backend, database, API keys, or `.env` file are needed to try it. Search, category/club filters, club discovery, event details, calendar navigation, and `.ics` downloads work locally. Sign-in and sign-up screens are UI previews; authentication is not connected and credentials are not saved or transmitted.
 
-The sample schedule is fixed to October 2026 to match the design mocks. The calendar initially shows October 12–18 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
+The sample schedule runs from October 27 to November 8, 2026. The calendar initially shows October 26–November 1 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
 
 From `frontend/`, run the frontend checks or build a production bundle:
 
@@ -108,26 +108,26 @@ With the virtual environment activated, run this from the repository root:
 python backend/app.py
 ```
 
-The development server starts at **http://127.0.0.1:5000** with debug mode and automatic reload enabled. Stop it with **Ctrl+C**. When returning to the project in a new terminal, activate the virtual environment again before starting the server.
+The development server starts at **http://127.0.0.1:5001** with debug mode and automatic reload enabled. Stop it with **Ctrl+C**. When returning to the project in a new terminal, activate the virtual environment again before starting the server.
 
 Available endpoints:
 
 | URL | Response |
 |---|---|
-| http://127.0.0.1:5000/ | Welcome message and server status |
-| http://127.0.0.1:5000/api/health | Health check with `"status": "ok"` |
-| http://127.0.0.1:5000/api/clubs | Sample clubs |
-| http://127.0.0.1:5000/api/events | Sample events dated today or later |
+| http://127.0.0.1:5001/ | Welcome message and server status |
+| http://127.0.0.1:5001/api/health | Health check with `"status": "ok"` |
+| http://127.0.0.1:5001/api/clubs | Sample clubs |
+| http://127.0.0.1:5001/api/events | Sample events dated today or later |
 
 The sample events are dated November 2026, so the events endpoint will return an empty list once all of those dates have passed.
 
-If port 5000 is already in use, start on another port instead:
+If port 5001 is already in use, start on another port instead:
 
 ```bash
-python -m flask --app backend/app.py run --debug --port 5001
+python -m flask --app backend/app.py run --debug --port 5002
 ```
 
-Then use `http://127.0.0.1:5001` for the URLs above.
+Then use `http://127.0.0.1:5002` for the URLs above.
 
 #### 3. Run the backend tests
 
@@ -137,7 +137,7 @@ From the repository root, with the virtual environment activated:
 python -m unittest discover -s tests -v
 ```
 
-The tests use Flask's test client, so the server does not need to be running. The current events test expects all three sample events to be upcoming; that assertion will need updating after the first sample event date (November 5, 2026).
+The tests use Flask's test client, so the server does not need to be running.
 
 ## Repository Structure
 

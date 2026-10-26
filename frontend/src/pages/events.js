@@ -17,7 +17,7 @@ export function eventsPage(params) {
       <label class="club-select"><span class="sr-only">Filter by club</span><select id="club-filter"><option value="all">All clubs</option>${clubs.map(club => `<option value="${club.id}" ${String(club.id) === filters.club ? 'selected' : ''}>${h(club.name)}</option>`).join('')}</select></label></div>
     </div>
     <div id="events-results" class="timeline"></div>
-    <p class="sample-note">A little inspiration for your week. Sample events · October 2026.</p>
+    <p class="sample-note">A little inspiration for your week. Sample events · October–November 2026.</p>
   </section>`;
 }
 

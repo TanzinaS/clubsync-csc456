@@ -33,9 +33,9 @@ Authentication is **not connected**. Forms validate their inputs and explain thi
 
 `src/services/data.js` imports the repository's `data/sample_events.json` and `data/sample_clubs.json`; Vite includes these files in the build. There are no duplicate event records in UI code. Edit the JSON files to change the sample schedule, then rebuild for production.
 
-The previously empty events file now contains 12 fictional events across October 13–25, 2026. Four clubs were added for the mock's cultural, debate, faith, and soccer events, preserving the existing ten clubs. Category aliases map the original club interests to the nine design categories.
+The previously empty events file now contains 12 fictional events across October 27–November 8, 2026. Four clubs were added for the mock's cultural, debate, faith, and soccer events, preserving the existing ten clubs. Category aliases map the original club interests to the nine design categories.
 
-The calendar opens on the first sample event's week, October 12–18, and labels its 2:50 PM Monday preview clock. “Today” switches to the real current week and time in `America/New_York`. Weeks without events show an empty state and a way back to the sample week. The sample events remain visible in the directory after their dates pass so the design can still be demonstrated.
+The calendar opens on the first sample event's week, October 26–November 1, and labels its 2:50 PM Monday preview clock. “Today” switches to the real current week and time in `America/New_York`. Weeks without events show an empty state and a way back to the sample week. The sample events remain visible in the directory after their dates pass so the design can still be demonstrated.
 
 The existing Flask endpoints use separate sample records and a simpler schema. Future API integration belongs in `src/services/data.js`.
 

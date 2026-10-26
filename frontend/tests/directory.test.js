@@ -44,16 +44,16 @@ test('campus dates and time positions use New York time, independent of browser 
 });
 
 test('week navigation partitions sample events and supports empty weeks', () => {
-  assert.equal(weekEvents(events, '2026-10-12').length, 6);
-  assert.equal(weekEvents(events, '2026-10-19').length, 6);
-  assert.equal(weekEvents(events, '2026-10-26').length, 0);
+  assert.equal(weekEvents(events, '2026-10-26').length, 6);
+  assert.equal(weekEvents(events, '2026-11-02').length, 6);
+  assert.equal(weekEvents(events, '2026-11-09').length, 0);
 });
 
 test('calendar exports UTC timestamps, escaped content and folded lines', () => {
   const file = calendarFile({ ...events[0], description: 'Hello, campus;\n' + 'é'.repeat(80) });
   assert.ok(file.startsWith('BEGIN:VCALENDAR\r\n'));
-  assert.ok(file.includes('DTSTART:20261013T170000Z'));
-  assert.ok(file.includes('DTEND:20261013T190000Z'));
+  assert.ok(file.includes('DTSTART:20261027T170000Z'));
+  assert.ok(file.includes('DTEND:20261027T190000Z'));
   assert.ok(file.includes('Hello\\, campus\\;\\n'));
   assert.ok(file.endsWith('END:VCALENDAR\r\n'));
   for (const line of file.split('\r\n')) assert.ok(Buffer.byteLength(line) <= 75);

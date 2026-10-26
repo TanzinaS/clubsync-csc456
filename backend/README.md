@@ -3,8 +3,8 @@
 Server-side code for ClubSync: API endpoints, data handling, authentication, and external integrations.
 
 **Team:** Sangita, Sarinda, Yazmyrat (Backend Developers)
-**Framework:** Not confirmed. Python/Flask has been suggested.
-**Database:** Not decided.
+**Framework:** Python / Flask, with Flask-Cors.
+**Database:** Not connected; API currently uses in-memory sample data.
 
 Individual responsibilities will be listed in the root README once finalized.
 
@@ -23,4 +23,4 @@ Never hard-code API keys, database passwords, or OAuth secrets. Load them from e
 
 ## Setup
 
-Setup instructions will be added once the framework is chosen.
+See the root README's [setup instructions](../README.md#setup) for virtual environment setup, dependency installation, starting the API, and running tests.

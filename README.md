@@ -2,6 +2,8 @@
 
 ClubSync is a web application that helps CCNY students discover campus club events and keep track of them in a personalized calendar.
 
+The frontend is branded **Campus Groups · CCNY**, with an events timeline, a club directory, and a weekly calendar.
+
 **Course:** CSC 456 — Topics in Software Engineering
 
 > This README describes the project and how the repository is organized. It is only updated for major changes.
@@ -41,16 +43,101 @@ The backend team collaborates on API/server logic, database management, authenti
 
 | Area | Decision |
 |---|---|
-| Frontend framework | Not decided |
-| Backend framework | Not decided (Python/Flask suggested) |
-| Database | Not decided |
+| Frontend | HTML, CSS, and JavaScript modules, built with Vite |
+| Backend framework | Python / Flask, with Flask-Cors |
+| Database | Not connected; API currently uses in-memory sample data |
 | Deployment platform | Not decided |
-
-When the team makes a decision, update this table and add setup instructions below.
 
 ## Setup
 
-Setup instructions will be added once the technology stack is chosen.
+### Run the web app
+
+Install Node.js 20.19+ (or 22.12+). From the repository root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open **http://127.0.0.1:5173** (or the local URL printed in your terminal). Stop the server with **Ctrl+C**.
+
+The frontend loads `data/sample_events.json` and `data/sample_clubs.json` directly. No backend, database, API keys, or `.env` file are needed to try it. Search, category/club filters, club discovery, event details, calendar navigation, and `.ics` downloads work locally. Sign-in and sign-up screens are UI previews; authentication is not connected and credentials are not saved or transmitted.
+
+The sample schedule runs from November 16 to December 8, 2026. The calendar initially shows November 16–22 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
+
+From `frontend/`, run the frontend checks or build a production bundle:
+
+```bash
+npm test
+npm run build
+npm run preview
+```
+
+The production output is in `frontend/dist/`. Preview serves it at **http://127.0.0.1:4173**. See [frontend/README.md](frontend/README.md) for routes and implementation details.
+
+### Run the backend API separately
+
+The Flask API currently has its own in-memory sample data. It is not yet connected to the frontend. No database or credentials are required.
+
+#### 1. Create a virtual environment and install dependencies
+
+Install Python 3.9 or newer. Open a terminal in the repository root (the folder containing this README), then run:
+
+**macOS / Linux:**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r backend/requirements.txt
+```
+
+**Windows PowerShell:**
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r backend/requirements.txt
+```
+
+#### 2. Start the backend
+
+With the virtual environment activated, run this from the repository root:
+
+```bash
+python backend/app.py
+```
+
+The development server starts at **http://127.0.0.1:5001** with debug mode and automatic reload enabled. Stop it with **Ctrl+C**. When returning to the project in a new terminal, activate the virtual environment again before starting the server.
+
+Available endpoints:
+
+| URL | Response |
+|---|---|
+| http://127.0.0.1:5001/ | Welcome message and server status |
+| http://127.0.0.1:5001/api/health | Health check with `"status": "ok"` |
+| http://127.0.0.1:5001/api/clubs | Sample clubs |
+| http://127.0.0.1:5001/api/events | Sample events dated today or later |
+
+The sample events are dated November 2026, so the events endpoint will return an empty list once all of those dates have passed.
+
+If port 5001 is already in use, start on another port instead:
+
+```bash
+python -m flask --app backend/app.py run --debug --port 5002
+```
+
+Then use `http://127.0.0.1:5002` for the URLs above.
+
+#### 3. Run the backend tests
+
+From the repository root, with the virtual environment activated:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+The tests use Flask's test client, so the server does not need to be running.
 
 ## Repository Structure
 

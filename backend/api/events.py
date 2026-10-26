@@ -2,6 +2,7 @@
 from datetime import date
 
 from flask import Blueprint, jsonify
+from services.demo_user import get_demo_user
 
 events_bp = Blueprint("events", __name__)
 
@@ -41,3 +42,18 @@ def get_events():
         event for event in EVENTS if event["date"] >= today
     ]
     return jsonify(upcoming_events)
+
+@events_bp.get("/api/events/personalized")
+def get_personalized_events():
+    user = get_demo_user()
+    followed_clubs = user["followed_clubs"]
+
+    today = date.today().isoformat()
+
+    personalized_events = [
+        event for event in EVENTS
+        if event["club_id"] in followed_clubs
+        and event["date"] >= today
+    ]
+
+    return jsonify(personalized_events), 200

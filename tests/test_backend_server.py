@@ -1,7 +1,9 @@
 
 import sys
+from datetime import date
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(
     0, str(Path(__file__).resolve().parents[1] / "backend")
@@ -46,7 +48,13 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(clubs[1]["name"], "Robotics Club")
         self.assertEqual(clubs[2]["name"], "Photography Club")
 
-    def test_get_events(self):
+    # /api/events only returns upcoming events, so pretend "today" is
+    # before every sample event. Otherwise this test fails once the
+    # sample dates pass.
+    @patch("api.events.date")
+    def test_get_events(self, mock_date):
+        mock_date.today.return_value = date(2026, 1, 1)
+
         response = self.client.get("/api/events")
 
         self.assertEqual(response.status_code, 200)

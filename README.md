@@ -64,7 +64,7 @@ Open **http://127.0.0.1:5173** (or the local URL printed in your terminal). Stop
 
 The frontend loads `data/sample_events.json` and `data/sample_clubs.json` directly. No backend, database, API keys, or `.env` file are needed to try it. Search, category/club filters, club discovery, event details, calendar navigation, and `.ics` downloads work locally. Sign-in and sign-up screens are UI previews; authentication is not connected and credentials are not saved or transmitted.
 
-The sample schedule runs from October 27 to November 8, 2026. The calendar initially shows October 26–November 1 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
+The sample schedule runs from November 16 to December 8, 2026. The calendar initially shows November 16–22 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
 
 From `frontend/`, run the frontend checks or build a production bundle:
 

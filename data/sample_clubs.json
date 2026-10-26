@@ -15,7 +15,7 @@
   },
   {
     "id": 3,
-    "name": "Baking club ",
+    "name": "Baking club",
     "category": "Culinary arts",
     "description": "Come join us to learn how to bake various types of desserts!",
     "contact_email": "contact@bakingclub.example"
@@ -25,7 +25,7 @@
     "name": "Photography Club",
     "category": "Media",
     "description": "A community for hobbyists to learn new techniques.",
-    "contact_email": "contact@photographyclub.example "
+    "contact_email": "contact@photographyclub.example"
   },
   {
     "id": 5,

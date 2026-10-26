@@ -1,1 +1,72 @@
-
+[
+{
+  "id": 1,
+  "name": "Math Wizards",
+  "category": "Mathematics",
+  "description": "A club focused on solving math proofs.",
+  "contact_email": "contact@mathwizards.org"
+},
+  {
+    "id": 2,
+    "name": "Roblox Zone",
+    "category": "Gaming",
+    "description": "Robloxians unite!",
+    "contact_email": "contact@robloxclub.org"
+  },
+  {
+    "id": 3,
+    "name": "Baking club ",
+    "category": "Culinary arts",
+    "description": "Come join us to learn how to bake various types of desserts!",
+    "contact_email": "contact@bakingclub.org"
+  },
+  {
+    "id": 4,
+    "name": "Photography Club",
+    "category": "Media",
+    "description": "A community for hobbyists to learn new techniques.",
+    "contact_email": "contact@photographyclub.org "
+  },
+  {
+    "id": 5,
+    "name": "Starlight Astronomy",
+    "category": "Science",
+    "description": "Amateur astronomers hosting dark-sky stargazing trips, telescope workshops, and space science discussions.",
+    "contact_email": "contact@starlightastronomy.org"
+  },
+  {
+    "id": 6,
+    "name": "Robotics Club",
+    "category": "Engineering",
+    "description": "We design, build, & program robots!",
+    "contact_email": "contact@roboticsclub.org"
+  },
+  {
+    "id": 7,
+    "name": "Let it Bloom!",
+    "category": "Gardening",
+    "description": "Community gardeners dedicated to urban agriculture & seed sharing initiatives.",
+    "contact_email": "contact@letitbloom.org"
+  },
+  {
+    "id": 8,
+    "name": "Climbers' Circle",
+    "category": "Outdoor",
+    "description": "We host monthly hiking events across the region!",
+    "contact_email": "contact@climberscircle.org"
+  },
+  {
+    "id": 9,
+    "name": "Chess Club",
+    "category": "Games",
+    "description": "A casual & competitive chess community hosting weekly & monthly tournaments.",
+    "contact_email": "contact@chessclub.org"
+  },
+  {
+    "id": 10,
+    "name": "Page Turners",
+    "category": "Literature",
+    "description": "Reading & debating popular modern fiction releases.",
+    "contact_email": "contact@pageturners.org"
+  }
+]

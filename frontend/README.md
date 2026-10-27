@@ -4,7 +4,7 @@ A responsive campus directory built with HTML, CSS, JavaScript modules, and Vite
 
 ## Run locally
 
-Requires Node.js 20.19+ or 22.12+ and npm. From the repository root:
+Requires Node.js 22.12+ and npm (Vitest needs an even-numbered release: 22.12+, 24, or 26+). From the repository root:
 
 ```bash
 cd frontend
@@ -45,11 +45,12 @@ From `frontend/`:
 
 ```bash
 npm test
+npm run coverage
 npm run build
 npm run preview
 ```
 
-Tests cover data relationships, combined filters, New York date/time handling, weekly boundaries, HTML escaping, and calendar export. The production bundle is generated in `dist/`; preview normally runs at **http://127.0.0.1:4173**. Hash routes work on static hosting without server rewrite rules.
+Tests run with Vitest and cover data relationships, combined filters, New York date/time handling, weekly boundaries, HTML escaping, and calendar export. `npm run coverage` runs the same tests and prints a V8 coverage report for every file under `src/`. The production bundle is generated in `dist/`; preview normally runs at **http://127.0.0.1:4173**. Hash routes work on static hosting without server rewrite rules.
 
 ## Source layout
 
@@ -62,6 +63,6 @@ Tests cover data relationships, combined filters, New York date/time handling, w
 | `src/styles/main.css` | Design tokens, layouts, responsive rules, and focus states |
 | `src/assets/campus-watercolor.png` | Generated clean hero artwork based on the supplied landing mock |
 | `src/mocks/` | Original reference screenshots, unchanged |
-| `tests/` | Node's built-in test runner; no browser required |
+| `tests/` | Vitest unit tests; no browser required |
 
 DM Sans is loaded from Google Fonts with system sans-serif fallbacks. All event data and hero artwork are bundled locally.

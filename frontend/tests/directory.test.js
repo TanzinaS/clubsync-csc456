@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { prepareDirectory, filterEvents, dayKey, startOfWeek, addDays, weekEvents, minutesOfDay, calendarFile, escapeHTML } from '../src/services/directory.js';

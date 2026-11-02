@@ -38,10 +38,14 @@ EVENTS = [
 @events_bp.get("/api/events")
 def get_events():
     today = date.today().isoformat()
+
     upcoming_events = [
-        event for event in EVENTS if event["date"] >= today
+        event for event in EVENTS
+        if event["date"] >= today
     ]
+
     return jsonify(upcoming_events)
+
 
 @events_bp.get("/api/events/personalized")
 def get_personalized_events():
@@ -57,3 +61,13 @@ def get_personalized_events():
     ]
 
     return jsonify(personalized_events), 200
+
+
+# Issue #16: Return a specific event by its ID.
+@events_bp.get("/api/events/<int:event_id>")
+def get_event_details(event_id):
+    for event in EVENTS:
+        if event["id"] == event_id:
+            return jsonify(event), 200
+
+    return jsonify({"error": "Event not found"}), 404

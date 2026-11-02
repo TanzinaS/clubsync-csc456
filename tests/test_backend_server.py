@@ -48,9 +48,7 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(clubs[1]["name"], "Robotics Club")
         self.assertEqual(clubs[2]["name"], "Photography Club")
 
-    # /api/events only returns upcoming events, so pretend "today" is
-    # before every sample event. Otherwise this test fails once the
-    # sample dates pass.
+    # Pretend today is before all sample events.
     @patch("api.events.date")
     def test_get_events(self, mock_date):
         mock_date.today.return_value = date(2026, 1, 1)
@@ -64,6 +62,33 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(events[0]["title"], "Computer Science Workshop")
         self.assertEqual(events[1]["title"], "Robotics Competition")
         self.assertEqual(events[2]["title"], "Photography Walk")
+
+    # Issue #16: Return the requested event by ID.
+    def test_get_event_details(self):
+        response = self.client.get("/api/events/2")
+
+        self.assertEqual(response.status_code, 200)
+
+        event = response.get_json()
+        self.assertEqual(event["id"], 2)
+        self.assertEqual(event["club_id"], 2)
+        self.assertEqual(event["title"], "Robotics Competition")
+        self.assertEqual(event["date"], "2026-11-12")
+        self.assertEqual(event["location"], "CCNY Campus")
+        self.assertEqual(
+            event["description"],
+            "Join a robotics competition."
+        )
+
+    # Issue #16: Invalid event IDs return 404.
+    def test_get_event_details_not_found(self):
+        response = self.client.get("/api/events/999")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.get_json()["error"],
+            "Event not found"
+        )
 
 
 if __name__ == "__main__":

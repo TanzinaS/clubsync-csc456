@@ -90,6 +90,50 @@ class TestBackendServer(unittest.TestCase):
             "Event not found"
         )
 
+    # Issue #17: Filter events by Club 1.
+    @patch("api.events.date")
+    def test_filter_events_by_club_1(self, mock_date):
+        mock_date.today.return_value = date(2026, 1, 1)
+
+        response = self.client.get("/api/events?club_id=1")
+
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["club_id"], 1)
+        self.assertEqual(
+            events[0]["title"],
+            "Computer Science Workshop"
+        )
+
+    # Issue #17: Filter events by Club 2.
+    @patch("api.events.date")
+    def test_filter_events_by_club_2(self, mock_date):
+        mock_date.today.return_value = date(2026, 1, 1)
+
+        response = self.client.get("/api/events?club_id=2")
+
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["club_id"], 2)
+        self.assertEqual(
+            events[0]["title"],
+            "Robotics Competition"
+        )
+
+    # Issue #17: A club with no events returns an empty list.
+    @patch("api.events.date")
+    def test_filter_events_invalid_club(self, mock_date):
+        mock_date.today.return_value = date(2026, 1, 1)
+
+        response = self.client.get("/api/events?club_id=999")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), [])
+
 
 if __name__ == "__main__":
     unittest.main()

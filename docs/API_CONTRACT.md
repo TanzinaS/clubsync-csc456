@@ -2,7 +2,7 @@
 
 **Status:** Draft for team review. The [V1 scope](#v1-scope--confirmed-pm-decisions-november-5-2026) was confirmed by the PM on November 5, 2026. Anything outside it is not approved yet.
 
-**Issue #27:** Yazmyrat, the data owner and #27's assignee, must confirm this format before [#27](https://github.com/TanzinaS/clubsync-csc456/issues/27) counts as complete. This document can merge first. Merging it does not complete #27.
+**Issue #27:** Yazmyrat, the data owner and [#27](https://github.com/TanzinaS/clubsync-csc456/issues/27)'s assignee, approved this format in his review of this PR, with one clarification: Baking Club (club 3) keeps its existing `Culinary arts` category (section 3.2).
 
 **Based on:** `main` at `5531d16`, open PRs, and issues, as of 2026-11-05.
 
@@ -25,7 +25,7 @@ Anything without a tag describes the proposed contract, not what `main` does tod
 
 These decisions set the scope of V1, the first working, deployed release. They are confirmed by the PM. `[V1]` marks what they require; it does not mean the item is built. **Where any other section of this document differs, this section wins for V1.** Everything tagged `[Post-V1]` stays a proposal for after the release.
 
-**Still pending:** Yazmyrat's confirmation of the club and event format for #27 (he is a requested reviewer on this PR).
+**Format approved:** Yazmyrat approved the club and event format for #27 in his review of this PR. Baking Club (club 3) keeps its existing `Culinary arts` category.
 
 **Authentication**
 - One shared demo user. No login tokens or real authentication.
@@ -36,7 +36,7 @@ These decisions set the scope of V1, the first working, deployed release. They a
 - The V1 schema is the existing fields and types in `data/sample_clubs.json` and `data/sample_events.json` (sections 3.2 and 3.3).
 - Club `category` values stay unchanged. The frontend keeps mapping them to display categories with `categoryAliases`. No category migration for V1.
 - Events are flat JSON records linked to clubs by `club_id`. The club object is not embedded.
-- The shared backend loaders (#55) become the single source of club and event data, replacing the in-memory records.
+- The shared backend loaders in `backend/services/sample_data.py` (#55) become the single source of club and event data, replacing the in-memory records.
 
 **Events**
 - `GET /api/events` returns all events, including past events, sorted by `start_time` as an instant, then by `id`.
@@ -92,7 +92,7 @@ These decisions set the scope of V1, the first working, deployed release. They a
 - The frontend receives them unchanged, then computes any display-only values on its side (section 6).
 - A future database, if approved, stores the same fields under the same names.
 
-V1 needs no data change: no field is renamed, and neither file changes. `[Post-V1]` A proposed migration would change the `category` value of 10 clubs (section 3.2).
+V1 needs no data change: no field is renamed, and neither file changes. `[Post-V1]` A proposed migration would change the `category` value of 9 clubs (section 3.2).
 
 **Today:** the frontend reads the JSON files directly, while the API serves 3 clubs and 3 events from separate in-memory records in a different shape.
 
@@ -149,7 +149,7 @@ Non-integer path IDs return `404` because Flask's `<int:...>` routes do not matc
 
 ### 3.1 Category
 
-`[Post-V1]` As a rule for club data: a closed list, taken from `CATEGORIES` in `frontend/src/services/directory.js`. Values are case-sensitive. In V1, event `tags[0]` values already follow it, club `category` values stay unchanged, and the frontend maps them to this list for display.
+`[Post-V1]` As a rule for club data: a closed list, taken from `CATEGORIES` in `frontend/src/services/directory.js`. Values are case-sensitive. In V1, event `tags[0]` values already follow it, club `category` values stay unchanged, and the frontend maps them to this list for display. Exception: club 3 keeps `Culinary arts` under the post-V1 proposal (section 3.2), which is not on this list.
 
 ```text
 "Tech" | "Cultural" | "Arts" | "Academic" | "Sports" | "Faith" | "Social" | "Community Service" | "Other"
@@ -165,7 +165,7 @@ Non-integer path IDs return `404` because Flask's `<int:...>` routes do not matc
 |---|---|---|
 | `id` | integer | Unique |
 | `name` | string | Non-empty, no leading or trailing spaces |
-| `category` | string | `[V1]` Non-empty. The value in `sample_clubs.json`, unchanged. `[Post-V1]` One value from section 3.1, if the migration is approved. |
+| `category` | string | `[V1]` Non-empty. The value in `sample_clubs.json`, unchanged. `[Post-V1]` One value from section 3.1, if the migration is approved, except club 3, which keeps `Culinary arts`. |
 | `description` | string | Non-empty |
 | `contact_email` | string | Email address |
 
@@ -183,13 +183,13 @@ Non-integer path IDs return `404` because Flask's `<int:...>` routes do not matc
 }
 ```
 
-**`[Post-V1]` data migration, not applied and not part of V1.** Ten clubs in `sample_clubs.json` use free-text categories that only work today because the frontend translates them. This change uses the frontend's existing alias table, so nothing would change on screen. Yazmyrat's confirmation is needed (section 7, decision 1).
+**`[Post-V1]` data migration, not applied and not part of V1.** Ten clubs in `sample_clubs.json` use free-text categories that only work today because the frontend translates them. The proposal changes 9 of them, using the frontend's existing alias table, so nothing would change on screen. Club 3 (Baking club) keeps `Culinary arts`, as Yazmyrat asked in review. Yazmyrat approved the other 9 changes, but the migration stays post-V1 and is not applied (section 7, decision 1).
 
 | Club IDs | Value in the file today | Proposed value |
 |---|---|---|
 | 1 | Mathematics | Academic |
 | 2 | Gaming | Tech |
-| 3 | Culinary arts | Social |
+| 3 | Culinary arts | Culinary arts (unchanged) |
 | 4 | Media | Arts |
 | 5 | Science | Academic |
 | 6 | Engineering | Tech |
@@ -541,7 +541,7 @@ These errors are not current behavior. `main` ignores `category` today and canno
 
 ### Shared data loaders (#55)
 
-`[Pending]` **PR #55 is not merged**, and has changes requested. `load_sample_clubs()` and `load_sample_events()` do not exist on `main`, and no endpoint uses them.
+`[On main]` **PR #55 is merged.** `load_sample_clubs()` and `load_sample_events()` are in `backend/services/sample_data.py`, with tests in `tests/backend/test_sample_data.py`. No endpoint uses them yet.
 
 `[V1]` The loaders become the single source of club and event data. The expected use is:
 
@@ -551,8 +551,7 @@ These errors are not current behavior. `main` ignores `category` today and canno
 
 Still undecided:
 
-- Where the loaders live. Review asks for `backend/services/`. The PR currently has identical copies in `backend/api/sample_data.py` and `backend/services/sample_data.py`.
-- Whether to cache data or read the files on each request. The PR reads on each call.
+- Whether to cache data or read the files on each request. The loaders read the files on each call.
 - How they are replaced if a database is approved.
 
 The contract only fixes the response shapes, so any of these choices can satisfy it.
@@ -570,11 +569,11 @@ Also client-side: text search, week grouping, date formatting, and the `club` fi
 
 ## 7. Decisions for the team to approve
 
-These are the choices this draft proposes where the repo does not settle the question. The last column records the V1 outcome confirmed by the PM on November 5, 2026. Proposals not adopted for V1 stay open for after V1. Yazmyrat, as data owner, needs to confirm decisions 1 to 3 before #27 counts as complete.
+These are the choices this draft proposes where the repo does not settle the question. The last column records the V1 outcome confirmed by the PM on November 5, 2026. Proposals not adopted for V1 stay open for after V1. Yazmyrat, as data owner, approved decisions 1 to 3. For decision 1, club 3 keeps `Culinary arts`.
 
 | # | Decision | Proposed | Why | Main alternative | V1 outcome |
 |---|---|---|---|---|---|
-| 1 | Category values | Migrate the 10 club values to the closed list | One set of values, and no translation layer on either side | Keep free-text values and copy the alias table into the backend | **Not for V1.** Values stay unchanged; the frontend keeps its mapping. Migration is post-V1. |
+| 1 | Category values | Migrate 9 club values to the closed list. Club 3 keeps `Culinary arts`. | One set of values, and no translation layer on either side | Keep free-text values and copy the alias table into the backend | **Not for V1.** Values stay unchanged; the frontend keeps its mapping. Migration is post-V1. |
 | 2 | Past events | `/api/events` includes them; `from` and `to` narrow the range | The calendar needs earlier weeks, and #57 asks for this | Upcoming only by default, as on `main`. Breaks the calendar's earlier weeks. | **Confirmed.** `from` and `to` are post-V1. |
 | 3 | Event response | Flat, joined by `club_id` | Matches the file exactly | Embed `club`. This creates a second event shape. | **Confirmed.** V1 events are flat records. The club is not embedded. |
 | 4 | Token transport | Bearer token in the `Authorization` header, if real accounts are approved | Works across origins whichever hosts are chosen, with no cookie or CSRF setup | HttpOnly session cookie. Safer against XSS, but needs same-site hosting or cross-site cookie and CSRF setup. | Post-V1 |
@@ -590,9 +589,9 @@ Checked by running the app on `main` at `5531d16`. A checked item is on `main`. 
 
 ### Data
 
-- [ ] Confirm the club and event format, which is required to complete #27. *Yazmyrat*
-- [ ] `[Post-V1]` Migrate the 10 club `category` values (section 3.2). *Yazmyrat, after confirmation*
-- [ ] `[Pending]` Finish and merge the loaders, PR #55. Review asks to move them to `backend/services/` and add tests. *Yazmyrat*
+- [x] Confirm the club and event format for #27. Approved in Yazmyrat's review of this PR, with club 3 keeping `Culinary arts`. *Yazmyrat*
+- [ ] `[Post-V1]` Migrate 9 club `category` values (section 3.2). Club 3 keeps `Culinary arts`. Not part of V1. *Yazmyrat*
+- [x] Loaders merged in #55, in `backend/services/sample_data.py`, with tests. No endpoint uses them yet. *Yazmyrat*
 - [ ] Validate clubs and events against the agreed format, #29. *Yazmyrat, QA*
 
 ### Events
@@ -639,7 +638,7 @@ Checked by running the app on `main` at `5531d16`. A checked item is on `main`. 
 
 ### Tests
 
-- [x] Test discovery in subfolders, backend coverage reporting in CI, and the club, follow, and startup tests are merged (#50, #51, #54, #60, #62). 16 backend tests pass on `main`.
+- [x] Test discovery in subfolders, backend coverage reporting in CI, and the club, follow, startup, and loader tests are merged (#50, #51, #54, #55, #60, #62). 18 backend tests pass on `main`.
 - [ ] `tests/test_backend_server.py` expects 3 clubs and 3 events with old titles and checks `date`, so it must change when the data does. Those IDs also change meaning: club 1 is Computer Science Club in memory but Math Wizards in the JSON. *Backend, QA*
 - [ ] Open PR #61 asserts `date` and that past events are hidden. That is correct today, but it needs updating, because decision 2 is confirmed for V1. *QA*
 - [ ] Optional for V1: add contract tests that check each endpoint's response against section 3. V1 endpoints still need automated tests. *QA*
@@ -650,5 +649,5 @@ Checked by running the app on `main` at `5531d16`. A checked item is on `main`. 
 - [ ] `[V1]` Read the API address from `VITE_API_BASE_URL`. *Denisa*
 - [ ] Add follow buttons, with followed clubs loaded from `GET /api/me`, and the personalized view. *Denisa*
 - [ ] `[Post-V1]` Add club pages. *Denisa*
-- [ ] `[Post-V1]` Remove `categoryAliases` if the data migration is approved. *Denisa*
+- [ ] `[Post-V1]` Remove `categoryAliases` if the data migration is approved, except the `Culinary arts` entry that club 3 still needs. *Denisa*
 - [ ] `[Post-V1]` Add the real sign-in flow if accounts are approved. *Denisa*

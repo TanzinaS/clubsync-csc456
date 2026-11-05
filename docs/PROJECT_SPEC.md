@@ -4,7 +4,7 @@
 
 **Based on:** `main` at `5531d16`, open PRs, and issues, as of 2026-11-05.
 
-**Companion doc:** [API_CONTRACT.md](API_CONTRACT.md) is the draft of the data shapes and endpoints this spec refers to. Yazmyrat, the data owner, must confirm the format before #27 counts as complete.
+**Companion doc:** [API_CONTRACT.md](API_CONTRACT.md) is the draft of the data shapes and endpoints this spec refers to. Yazmyrat, the data owner, approved the format in his review of PR #63. Baking Club (club 3) keeps its existing `Culinary arts` category.
 
 **Where things stand:** the frontend works well but only on bundled sample files. The backend exists and gained event details and club filtering in #59, but it still serves different, smaller data. The two have never been connected. Most of the remaining work depends on connecting them, and that starts with agreeing on the contract.
 
@@ -39,7 +39,7 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
 | Frontend build | Vite 7 | Requires Node 22.12+, 24, or 26+ |
 | Frontend tests | Vitest 5 with V8 coverage | 7 tests in `frontend/tests/` |
 | Backend | Python, Flask 3, Flask-Cors | Runs on port 5001 |
-| Backend tests | Python `unittest` | 16 tests, including `tests/backend/` |
+| Backend tests | Python `unittest` | 18 tests, including `tests/backend/` |
 | CI | GitHub Actions | `tests.yml` runs backend tests with coverage on pull requests to `main` |
 
 ### Current vs. proposed
@@ -104,7 +104,7 @@ Items tagged `[V1]` are confirmed for V1. **The other proposals below are not ap
 
 ### Target: Phase 1 is `[V1]`, Phase 2 is `[Post-V1]`
 
-The loaders are `[In PR]` in #55. V1 hosting is Vercel and Render, which both serve over HTTPS. The database is post-V1.
+The loaders are `[On main]` in `backend/services/sample_data.py` (#55), but no endpoint uses them yet. V1 hosting is Vercel and Render, which both serve over HTTPS. The database is post-V1.
 
 ```text
   Browser
@@ -160,16 +160,16 @@ Demo user logic is in `services/demo_user.py`. `backend/models/` and `backend/in
 | `data/*.json` | 14 | 12, from November 16 to December 8, 2026 | Frontend |
 | Python records in `backend/api/` | 3 | 3 | Backend |
 
-The two sources disagree on more than size. Club 1 is Math Wizards in the JSON but Computer Science Club in the backend. Events use `start_time` and `end_time` in the JSON but `date` in the backend. `[V1]` The JSON shape is the single standard, with `category` values unchanged. `[Post-V1]` The draft contract also proposes changing 10 club `category` values. That change has not been applied.
+The two sources disagree on more than size. Club 1 is Math Wizards in the JSON but Computer Science Club in the backend. Events use `start_time` and `end_time` in the JSON but `date` in the backend. `[V1]` The JSON shape is the single standard, with `category` values unchanged. `[Post-V1]` The draft contract also proposes changing 9 club `category` values. Club 3 (Baking club) keeps `Culinary arts`. That change has not been applied.
 
 ### Tests and coverage
 
 | Suite | Result | Coverage |
 |---|---|---|
 | Frontend | 7 of 7 pass | 21.81% of lines overall. `directory.js` is at 87.8%. `main.js`, `ui.js`, `data.js`, and all pages are at 0%. |
-| Backend | 16 of 16 pass | 77% in the CI run on #50: `app.py` 95%, `demo_user.py` 91%, `events.py` 77%, `clubs.py` 55%. |
+| Backend | 18 of 18 pass | 77% in the CI run on #50: `app.py` 95%, `demo_user.py` 91%, `events.py` 77%, `clubs.py` 55%. |
 
-Backend tests by file: `tests/test_backend_server.py` (9), `tests/backend/test_club_following.py` (4), `tests/backend/test_club_endpoints.py` (2), and `tests/backend/test_startup.py` (1). CI now discovers `tests/backend/` and reports coverage on pull requests. Frontend tests do not run in CI until #53 merges.
+Backend tests by file: `tests/test_backend_server.py` (9), `tests/backend/test_club_following.py` (4), `tests/backend/test_club_endpoints.py` (2), `tests/backend/test_sample_data.py` (2), and `tests/backend/test_startup.py` (1). CI now discovers `tests/backend/` and reports coverage on pull requests. Frontend tests do not run in CI until #53 merges.
 
 ### Pull requests
 
@@ -177,7 +177,6 @@ Backend tests by file: `tests/test_backend_server.py` (9), `tests/backend/test_c
 
 | PR | What it does | Review state | Note |
 |---|---|---|---|
-| #55 | Sample data loaders | Changes requested | Nothing on `main` uses loaders yet. Review asks to move them to `backend/services/` and add tests. |
 | #56 | Backend `.ics` export | Changes requested | Conflicts with `main` |
 | #53 | Frontend CI | Changes requested | Update from `main`, include `data/` changes |
 | #61 | Event endpoint tests | Approved | Asserts `date` and hidden past events, which the draft contract proposes changing |
@@ -189,6 +188,7 @@ Backend tests by file: `tests/test_backend_server.py` (9), `tests/backend/test_c
 | #50 | Backend startup test |
 | #51 | Test discovery in subfolders |
 | #54 | Backend coverage reporting in CI |
+| #55 | Sample data loaders in `backend/services/sample_data.py`, with tests. Nothing on `main` uses them yet. |
 | #59 | `GET /api/events/{id}` and the `club_id` filter |
 | #60 | Club endpoint tests |
 | #62 | Follow and unfollow tests |
@@ -207,7 +207,7 @@ Owners come from the README and #57. Please correct anything that has changed. I
 - [ ] Raise test coverage: `main.js`, `ui.js`, and all pages are at 0%
 - [ ] `[V1]` Read the API address from `VITE_API_BASE_URL`
 - [ ] `[Post-V1]` Build a single club page, with the club's info and events
-- [ ] `[Post-V1]` Remove `categoryAliases`, if the club category migration is approved
+- [ ] `[Post-V1]` Remove `categoryAliases`, if the club category migration is approved, except the `Culinary arts` entry that club 3 still needs
 - [ ] `[Post-V1]` Connect the sign-up, sign-in, and sign-out flow, if real accounts are approved
 - [ ] `[V1]` Keep the "Continue with Google" button preview-only. `[Post-V1]` Real Google sign-in, if approved
 
@@ -216,7 +216,7 @@ Owners come from the README and #57. Please correct anything that has changed. I
 **Requested in #57**
 
 - [x] Add event details and the `club_id` filter (#59)
-- [ ] Move routes off the in-memory records, using the loaders if #55 merges
+- [ ] Move routes off the in-memory records, using the loaders from #55 in `backend/services/sample_data.py`
 - [ ] Serve all 14 clubs and 12 events in the sample data format, and keep past events
 - [ ] Add `GET /api/me`, returning `id`, `name`, and `followed_clubs`
 - [ ] Update `/api/events/personalized` to use `start_time` and include past events
@@ -248,12 +248,12 @@ Owners come from the README and #57. Please correct anything that has changed. I
 
 ### Data (Yazmyrat)
 
-- [ ] **Review and confirm or change the event and club format in the draft contract. #27 is not complete until this is done.**
-- [ ] Finish the loaders in PR #55 (#28)
+- [x] Review and confirm the event and club format in the draft contract (#27). Approved in the PR #63 review, with club 3 keeping `Culinary arts`.
+- [x] Build the loaders, merged in #55 (#28)
 - [ ] Validate clubs and events: required fields, valid times, and matching `club_id` values (#29)
 - [ ] Resolve where real club and event data will come from, and who keeps it current (section 6)
 - [ ] Extend or replace the sample schedule. Sample events end on December 8, 2026, so the app would show no upcoming events after that.
-- [ ] `[Post-V1]` Migrate the 10 club `category` values to the shared list, if confirmed (see the contract, section 3.2)
+- [ ] `[Post-V1]` Migrate 9 club `category` values to the shared list, if confirmed. Club 3 keeps `Culinary arts` (see the contract, section 3.2)
 
 ### QA (Ayman)
 
@@ -270,7 +270,7 @@ Owners come from the README and #57. Please correct anything that has changed. I
 ### PM / DevOps (Tanzina)
 
 - [ ] Run the team's review of the draft contract and record each decision
-- [ ] Make sure Yazmyrat has confirmed the format before #27 is closed
+- [x] Make sure Yazmyrat has confirmed the format before #27 is closed. He approved it in the PR #63 review.
 - [ ] Confirm the owners of the events and clubs work in #57 (see the tracking notes in section 3)
 - [ ] Assign owners for the single-club endpoint and error handling, and for the database and authentication if approved
 - [x] Decide on the V1 hosts: Vercel for the frontend and Render for the backend. The database provider is post-V1.
@@ -287,7 +287,7 @@ Owners come from the README and #57. Please correct anything that has changed. I
 
 | # | Decision | On `main` today | Proposal | Blocks | Needed by | V1 outcome |
 |---|---|---|---|---|---|---|
-| 1 | **API contract and data format (#27)** | Two different formats | Draft in `API_CONTRACT.md`. **Needs Yazmyrat's confirmation.** | **Almost everything:** #57, frontend integration, QA test updates | Now | Existing JSON fields and types, with categories unchanged. **Yazmyrat's confirmation still pending.** |
+| 1 | **API contract and data format (#27)** | Two different formats | Draft in `API_CONTRACT.md`. **Approved by Yazmyrat.** | **Almost everything:** #57, frontend integration, QA test updates | Now | Existing JSON fields and types, with categories unchanged. **Approved by Yazmyrat.** The post-V1 migration keeps club 3 as `Culinary arts`. |
 | 2 | **Authentication: demo or real** | Demo user, no accounts | Real accounts, after demo-user work | Users table, sign-in UI, personalized view for real users | Now | Shared demo user. Real accounts are post-V1. |
 | 3 | **Database** | None | Postgres | Models, real accounts, persistent follows | Before auth work starts | No database. Post-V1. |
 | 4 | **Deployment platform** | None | None yet | CI deployment, production config, monitoring, and the managed database choice | Before auth work starts | Vercel and Render |
@@ -298,14 +298,14 @@ Owners come from the README and #57. Please correct anything that has changed. I
 | 9 | Scope of RSVP and Google integrations | Not built | Cut unless time remains | Only scope | Soon | Open |
 | 10 | Product name | ClubSync and Campus Groups both used | None yet | Nothing technical | Before deployment | Open |
 
-**Decision 1 and #27:** this PR's docs can merge as a draft, but merging does not complete #27. #27 stays open until Yazmyrat, its assignee and the data owner, confirms the club and event format, including any requested changes.
+**Decision 1 and #27:** Yazmyrat, #27's assignee and the data owner, approved the club and event format in his review of this PR. Baking Club (club 3) keeps its existing `Culinary arts` category. The category migration remains post-V1.
 
 ## 7. Suggested sequence
 
 `[Proposed]` A suggested order, not an approved plan. Step 8 is post-V1. Steps 6 and 9 use the V1 hosting decision: Vercel and Render.
 
-1. **Agree on the contract.** Review `API_CONTRACT.md`, settle decisions 1 and 2, and get Yazmyrat's confirmation so #27 can close.
-2. **Clear the review queue.** #50, #51, #54, #59, #60, and #62 are merged. Finish #55, decide on #61 and #56, and finish #53.
+1. **Agree on the contract.** Review `API_CONTRACT.md`, settle decisions 1 and 2, and get Yazmyrat's confirmation so #27 can close. Yazmyrat's confirmation is done.
+2. **Clear the review queue.** #50, #51, #54, #55, #59, #60, and #62 are merged. Decide on #61 and #56, and finish #53.
 3. **Make the data canonical.** Apply the confirmed format and add validation (#29).
 4. **Serve the real data.** Move backend routes off the in-memory records, add the missing endpoints, and update the tests together (#57).
 5. **Connect the frontend to the API.** Replace the bundled data in `services/data.js` (#3). This is the point where the project first works end to end.

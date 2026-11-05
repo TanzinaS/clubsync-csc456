@@ -1,12 +1,21 @@
 # ClubSync Project Specification
 
-**Status:** Draft for team review.
+**Status:** Draft for team review. **Proposed items are not approved.**
 
-**Based on:** `main` at `6a92223`, open PRs, and issues, as of 2026-11-05.
+**Based on:** `main` at `5531d16`, open PRs, and issues, as of 2026-11-05.
 
-**Companion doc:** [API_CONTRACT.md](API_CONTRACT.md) defines the data shapes and endpoints this spec refers to.
+**Companion doc:** [API_CONTRACT.md](API_CONTRACT.md) is the draft of the data shapes and endpoints this spec refers to. Yazmyrat, the data owner, must confirm the format before #27 counts as complete.
 
-**Where things stand:** the frontend works well but only on bundled sample files. The backend exists but serves different, smaller data. The two have never been connected. Most of the remaining work depends on connecting them, and that starts with agreeing on the contract.
+**Where things stand:** the frontend works well but only on bundled sample files. The backend exists and gained event details and club filtering in #59, but it still serves different, smaller data. The two have never been connected. Most of the remaining work depends on connecting them, and that starts with agreeing on the contract.
+
+### How to read this document
+
+| Tag | Meaning |
+|---|---|
+| `[On main]` | Implemented on `main` today |
+| `[In PR]` | In an open pull request, not on `main` |
+| `[Proposed]` | A suggestion that the team has not approved |
+| `[Undecided]` | No decision or proposal is settled |
 
 ## 1. What ClubSync is
 
@@ -20,7 +29,7 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
 
 ## 2. Tech stack and frameworks
 
-### In use
+### In use `[On main]`
 
 | Area | Technology | Details |
 |---|---|---|
@@ -28,33 +37,35 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
 | Frontend build | Vite 7 | Requires Node 22.12+, 24, or 26+ |
 | Frontend tests | Vitest 5 with V8 coverage | 7 tests in `frontend/tests/` |
 | Backend | Python, Flask 3, Flask-Cors | Runs on port 5001 |
-| Backend tests | Python `unittest` | 4 tests run on `main` |
-| CI | GitHub Actions | `tests.yml` runs backend tests on pull requests to `main` |
+| Backend tests | Python `unittest` | 16 tests, including `tests/backend/` |
+| CI | GitHub Actions | `tests.yml` runs backend tests with coverage on pull requests to `main` |
 
-### Decisions in progress
+### Current vs. proposed
 
-| Area | State |
-|---|---|
-| Database | None connected. Postgres is the leading choice. |
-| Authentication | UI preview only. Leaning toward real accounts. |
-| Hosting | Not decided for frontend, backend, or database. |
-| Frontend CI | PR #53 is open with changes requested. |
-| Backend coverage in CI | PR #54 is open and approved. |
+**None of the proposals below are approved.**
+
+| Area | On `main` today | Proposed or still undecided |
+|---|---|---|
+| Authentication | None. Sign-in and sign-up forms are previews that send and save nothing. One shared demo user. | `[Undecided]` Demo or real accounts. `[Proposed]` Real accounts with signup, login, salted password hashes, and bearer tokens. |
+| Database storage | None. Clubs and events are in-memory records, and follows are in memory and lost on restart. | `[Undecided]` Database choice. `[Proposed]` Postgres with users, clubs, events, and follows tables. |
+| Deployment | None. Everything runs locally, and `app.py` starts with `debug=True`. | `[Undecided]` Frontend host, backend host, and managed database provider. |
+| Event filtering | API: `club_id` only. Frontend: search, category, and club filters, in the browser on bundled data. | `[Proposed]` API `category`, `from`, and `to` filters. Not built. |
+| Frontend CI | Not running. | `[In PR]` #53, changes requested. |
 
 ## 3. Features
 
-**Status key:** `[Done]` · `[In Progress]` · `[Not Started]`
+**Status key:** `[Done]` · `[In Progress]` · `[Not Started]`. These describe `main` only.
 
-| Feature | Status | Frontend | Backend |
-|---|---|---|---|
-| Events feed with search and category/club filtering | `[In Progress]` | Complete on bundled data | List endpoint uses old data. Club filter is in PR #59. No category filter. |
-| Weekly calendar view | `[In Progress]` | Complete on bundled data, opens on a sample week with a preview clock | Hides past events, which would empty earlier weeks |
-| Club discovery and club pages | `[In Progress]` | Searchable directory works. No page for a single club. | 3 of 14 clubs. No single-club endpoint. |
-| Event details view | `[In Progress]` | Detail dialog works on bundled data | Endpoint is in PR #59, not on `main` |
-| Follow / unfollow clubs | `[In Progress]` | No follow buttons | Works for clubs 1 to 3 only, in memory, for one demo user |
-| Personalized events and calendar for a logged-in user | `[In Progress]` | Not started (#58) | Demo-user endpoint only, on the old data shape. No logged-in users exist. |
-| Calendar export (.ics) | `[Done]` | Download works and is tested | Optional second version in PR #56. See section 6. |
-| Authentication (sign-up, login, hashed passwords) | `[Not Started]` | Preview forms that send and save nothing | Nothing built |
+| Feature | Status | Frontend on `main` | Backend on `main` | Not yet on `main` |
+|---|---|---|---|---|
+| Events feed with search and category/club filtering | `[In Progress]` | Complete on bundled data | List endpoint and `club_id` filter work, on 3 in-memory events | `[Proposed]` API `category`, `from`, and `to` filters, and connection to the API |
+| Weekly calendar view | `[In Progress]` | Complete on bundled data, opens on a sample week with a preview clock | Hides past events, which would empty earlier weeks | Connection to the API, and past events in the API (#57) |
+| Club discovery and club pages | `[In Progress]` | Searchable directory works. No page for a single club. | 3 of 14 clubs. No single-club endpoint. | All 14 clubs (#57). `[Proposed]` `GET /api/clubs/{id}` and a club page. |
+| Event details view | `[In Progress]` | Detail dialog works on bundled data | `GET /api/events/{id}` works, on 3 in-memory events | Sample data format, and connection to the API |
+| Follow / unfollow clubs | `[In Progress]` | No follow buttons | Works for clubs 1 to 3 only, in memory, for one demo user | All 14 clubs (#57), and follow buttons. `[Proposed]` Per-user storage. |
+| Personalized events and calendar for a logged-in user | `[In Progress]` | Not started (#58) | Demo-user endpoint only, on the old data shape. No logged-in users exist. | `start_time` support (#57), and the frontend view. `[Proposed]` Real users. |
+| Calendar export (.ics) | `[Done]` | Download works and is tested | None | `[In PR]` Optional backend version in #56. See section 6. |
+| Authentication (sign-up, login, hashed passwords) | `[Not Started]` | Preview forms that send and save nothing | Nothing built | `[Undecided]` See section 6. |
 
 ### Also tracked in FEATURES.md
 
@@ -66,14 +77,14 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
 
 `FEATURES.md` was last updated on 2026-10-13 and is now out of date. For example, it lists the Events API as Planned.
 
-### Tracking mismatches
+### Tracking notes
 
-- Issues #16 (event details) and #17 (event filtering) are closed, but that code is still only in open PR #59.
-- #57 is an issue, not a PR. It lists what the frontend needs from the backend and matches the contract.
+- #57 is an issue, not a PR. It lists what the frontend needs from the backend, and the contract covers all of it.
+- #57's checklist assigns work to `SShrestha57` and `sarindashrestha7-max`, but its assignees are `Yazmurat` and `sarindashrestha7-max`. The PM should confirm who owns the events and clubs work.
 
 ## 4. Architecture and components
 
-### Today: two disconnected halves
+### On `main` today: two disconnected halves
 
 ```text
   FRONTEND (Vite)                         BACKEND (Flask, port 5001)
@@ -89,7 +100,9 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
   No network calls connect the two sides.
 ```
 
-### Target
+### `[Proposed]` Target, not approved
+
+The loaders are `[In PR]` in #55. The database, hosting, and HTTPS are `[Undecided]`.
 
 ```text
   Browser
@@ -97,16 +110,16 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
     v
   FRONTEND: pages -> services/data.js -> fetch
     |
-    |  HTTPS + JSON, defined by docs/API_CONTRACT.md
+    |  HTTPS + JSON, defined by docs/API_CONTRACT.md (draft)
     v
   BACKEND: api/ routes -> services/ business logic
     |
     +-- Phase 1: sample data loaders -> data/*.json
     |
-    +-- Phase 2: database (users, clubs, events, follows)
+    +-- Phase 2, if approved: database (users, clubs, events, follows)
 ```
 
-### Frontend components
+### Frontend components `[On main]`
 
 | Path | Role |
 |---|---|
@@ -117,11 +130,13 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
 | `src/pages/calendar.js` | `#/calendar` weekly calendar, day-grouped agenda on mobile |
 | `src/pages/auth.js` | `#/signin` and `#/signup` preview forms |
 | `src/components/ui.js` | Icons, tags, event cards, timeline, event detail |
-| `src/services/data.js` | Data boundary. Imports the JSON today, and is where API calls will go. |
+| `src/services/data.js` | Data boundary. Imports the JSON today, and is where API calls would go. |
 | `src/services/directory.js` | Joins, filters, New York dates, `.ics` generation, HTML escaping |
 | `src/styles/main.css` | Design tokens and layouts |
 
-### Backend routes on `main`
+### Backend routes `[On main]`
+
+Verified by listing the routes of the running app at `5531d16`.
 
 | Route | Function | File | Notes |
 |---|---|---|---|
@@ -130,7 +145,8 @@ ClubSync is a CCNY campus events and clubs web app. Students browse events, disc
 | `GET /api/clubs` | `get_clubs` | `api/clubs.py` | 3 in-memory clubs |
 | `POST /api/clubs/{id}/follow` | `follow_club_route` | `api/clubs.py` | Demo user, clubs 1 to 3 |
 | `POST /api/clubs/{id}/unfollow` | `unfollow_club_route` | `api/clubs.py` | Demo user, clubs 1 to 3 |
-| `GET /api/events` | `get_events` | `api/events.py` | 3 in-memory events, upcoming only |
+| `GET /api/events` | `get_events` | `api/events.py` | 3 in-memory events, upcoming only. Supports `?club_id=`, with `400` for a non-integer value. |
+| `GET /api/events/{id}` | `get_event_details` | `api/events.py` | 3 in-memory events. JSON `404` for an unknown ID. |
 | `GET /api/events/personalized` | `get_personalized_events` | `api/events.py` | Demo user, upcoming only |
 
 Demo user logic is in `services/demo_user.py`. `backend/models/` and `backend/integrations/` are empty.
@@ -142,73 +158,83 @@ Demo user logic is in `services/demo_user.py`. `backend/models/` and `backend/in
 | `data/*.json` | 14 | 12, from November 16 to December 8, 2026 | Frontend |
 | Python records in `backend/api/` | 3 | 3 | Backend |
 
-The two sources disagree on more than size. Club 1 is Math Wizards in the JSON but Computer Science Club in the backend. Events use `start_time` and `end_time` in the JSON but `date` in the backend. The contract makes the JSON shape the single standard.
+The two sources disagree on more than size. Club 1 is Math Wizards in the JSON but Computer Science Club in the backend. Events use `start_time` and `end_time` in the JSON but `date` in the backend. `[Proposed]` The draft contract makes the JSON shape the single standard, with a change to 10 club `category` values that has not been applied.
 
 ### Tests and coverage
-
-Results from running both suites on 2026-11-05:
 
 | Suite | Result | Coverage |
 |---|---|---|
 | Frontend | 7 of 7 pass | 21.81% of lines overall. `directory.js` is at 87.8%. `main.js`, `ui.js`, `data.js`, and all pages are at 0%. |
-| Backend | 4 of 4 pass | Not measured on `main`; PR #54 adds this. |
+| Backend | 16 of 16 pass | 77% in the CI run on #50: `app.py` 95%, `demo_user.py` 91%, `events.py` 77%, `clubs.py` 55%. |
 
-Tests in `tests/backend/` do not run yet, because they cannot be discovered until PR #51 merges.
+Backend tests by file: `tests/test_backend_server.py` (9), `tests/backend/test_club_following.py` (4), `tests/backend/test_club_endpoints.py` (2), and `tests/backend/test_startup.py` (1). CI now discovers `tests/backend/` and reports coverage on pull requests. Frontend tests do not run in CI until #53 merges.
 
-### Open pull requests
+### Pull requests
+
+**Open**
 
 | PR | What it does | Review state | Note |
 |---|---|---|---|
-| #55 | Sample data loaders | Changes requested | Move to `backend/services/`, add tests |
-| #59 | Event details, club filter | Approved | Conflicts with #56. Tests assert the old `date` field. |
-| #56 | Backend `.ics` export | Changes requested | Conflicts with #59 |
-| #51 | Test discovery in subfolders | Approved | Needed for `tests/backend/` to run |
-| #50 | Backend startup test | Changes requested | Has a stray `=` that will fail CI once #51 merges |
+| #55 | Sample data loaders | Changes requested | Nothing on `main` uses loaders yet. Review asks to move them to `backend/services/` and add tests. |
+| #56 | Backend `.ics` export | Changes requested | Conflicts with `main` |
 | #53 | Frontend CI | Changes requested | Update from `main`, include `data/` changes |
-| #54 | Backend coverage in CI | Approved | |
-| #60 | Club endpoint tests | Approved | |
-| #61 | Event endpoint tests | Approved | Asserts `date` and hidden past events, which the contract changes |
-| #62 | Follow and unfollow tests | Approved | |
+| #61 | Event endpoint tests | Approved | Asserts `date` and hidden past events, which the draft contract proposes changing |
+
+**Merged recently**
+
+| PR | What it did |
+|---|---|
+| #50 | Backend startup test |
+| #51 | Test discovery in subfolders |
+| #54 | Backend coverage reporting in CI |
+| #59 | `GET /api/events/{id}` and the `club_id` filter |
+| #60 | Club endpoint tests |
+| #62 | Follow and unfollow tests |
 
 ## 5. What's still needed, by role
 
-Owners come from the README and #57. Please correct anything that has changed.
+Owners come from the README and #57. Please correct anything that has changed. Items tagged `[Proposed]` depend on decisions in section 6 and should not start until those are made.
 
 ### Frontend (Denisa)
 
-- [ ] Switch `services/data.js` from bundled JSON to the live API, with `VITE_API_BASE_URL` for the address
-- [ ] Add loading and error states, since startup will now depend on a network request
+- [ ] Switch `services/data.js` from bundled JSON to the live API once it serves the agreed format
+- [ ] Add loading and error states, since startup would then depend on a network request
 - [ ] Remove the sample-week default and preview clock from the calendar once real data is live
-- [ ] Remove `categoryAliases` after the club category migration
-- [ ] Add follow and unfollow buttons, keeping state across refresh through `GET /api/me`
+- [ ] Add follow and unfollow buttons, keeping state across refresh through the current-user endpoint (#57)
 - [ ] Build the personalized calendar and feed, with an empty state for no followed clubs (#58)
-- [ ] Build a single club page, with the club's info and events
-- [ ] Connect the sign-up, sign-in, and sign-out flow, and show the signed-in state in the navigation
-- [ ] Remove or hide the "Continue with Google" button unless Google sign-in is approved
 - [ ] Raise test coverage: `main.js`, `ui.js`, and all pages are at 0%
+- [ ] `[Proposed]` Build a single club page, with the club's info and events
+- [ ] `[Proposed]` Read the API address from `VITE_API_BASE_URL`
+- [ ] `[Proposed]` Remove `categoryAliases`, if the club category migration is approved
+- [ ] `[Proposed]` Connect the sign-up, sign-in, and sign-out flow, if real accounts are approved
+- [ ] `[Undecided]` Remove or hide the "Continue with Google" button, unless Google sign-in is approved
 
 ### Backend (Sangita, Sarinda, Yazmyrat)
 
-**Move to the contract**
+**Requested in #57**
 
-- [ ] Merge the approved event work in #59, then move routes onto the data loaders (#57)
-- [ ] Serve all 14 clubs and 12 events in the canonical format, and keep past events (#57)
-- [ ] Add `category`, `from`, and `to` filters, and sort events by start time
-- [ ] Add `GET /api/clubs/{id}`
-- [ ] Add `GET /api/me`
+- [x] Add event details and the `club_id` filter (#59)
+- [ ] Move routes off the in-memory records, using the loaders if #55 merges
+- [ ] Serve all 14 clubs and 12 events in the sample data format, and keep past events
+- [ ] Add a current-user endpoint that includes `followed_clubs`
 - [ ] Update `/api/events/personalized` to use `start_time`
-- [ ] Accept all 14 clubs in follow and unfollow (#57)
-- [ ] Return JSON for all errors, including unknown routes and wrong methods
+- [ ] Accept all 14 clubs in follow and unfollow
 
-**Real accounts and persistence**
+**`[Proposed]` From the draft contract**
+
+- [ ] Add `category`, `from`, and `to` filters, including `category=All`, and sort events by start time
+- [ ] Add `GET /api/clubs/{id}`
+- [ ] Return JSON for all errors, including `500` when data cannot be loaded
+
+**`[Proposed]` Real accounts and persistence, only if approved**
 
 - [ ] Set up the database, models, and migrations in `backend/models/`
 - [ ] Load clubs and events into the database from the JSON files, keeping the same IDs
 - [ ] Add a users table, `POST /api/auth/signup`, and `POST /api/auth/login`, with salted password hashes
-- [ ] Issue tokens and protect the follow, unfollow, personalized, and me endpoints
+- [ ] Issue tokens and protect the follow, unfollow, personalized, and current-user endpoints
 - [ ] Persist follows per user in the database, replacing `DEMO_USER`
 
-**Ready for production**
+**`[Proposed]` Ready for production, once hosting is chosen**
 
 - [ ] Run under a production server such as Gunicorn. `app.py` currently starts with `debug=True`.
 - [ ] Load secrets and database settings from environment variables, and add `.env.example`
@@ -216,61 +242,71 @@ Owners come from the README and #57. Please correct anything that has changed.
 
 ### Data (Yazmyrat)
 
-- [ ] Get the team's agreement on the canonical event and club schema (#27)
+- [ ] **Review and confirm or change the event and club format in the draft contract. #27 is not complete until this is done.**
 - [ ] Finish the loaders in PR #55 (#28)
-- [ ] Migrate the 10 club `category` values to the shared list (see the contract, section 3.2)
 - [ ] Validate clubs and events: required fields, valid times, and matching `club_id` values (#29)
 - [ ] Resolve where real club and event data will come from, and who keeps it current (section 6)
-- [ ] Extend or replace the sample schedule. Sample events end on December 8, 2026, so the app will show no upcoming events after that.
+- [ ] Extend or replace the sample schedule. Sample events end on December 8, 2026, so the app would show no upcoming events after that.
+- [ ] `[Proposed]` Migrate the 10 club `category` values to the shared list, if confirmed (see the contract, section 3.2)
 
 ### QA (Ayman)
 
-- [ ] Finish the test PRs: fix #50, and merge #51, #60, and #62
-- [ ] Update #61 and existing tests to the canonical format
-- [ ] Add contract tests that check every endpoint's response against the schemas
+- [x] Automate the startup test (#50) and test discovery in subfolders (#51)
+- [x] Add club endpoint tests (#60) and follow and unfollow tests (#62)
+- [ ] Finish event endpoint tests in #61 (#32), and update them if the event format changes
+- [ ] Update `tests/test_backend_server.py` when the backend moves to the sample data format
 - [ ] Add frontend and backend integration tests against a running API
-- [ ] Add UI tests for key flows: browse, filter, follow, sign in, personalized calendar, `.ics` download
-- [ ] Expand backend coverage once #54 reports it, and agree on a target with the team
-- [ ] Complete the manual checks: club endpoints (#31), event endpoints (#32), following (#33), calendar (#34), full demo (#35)
+- [ ] Add UI tests for key flows: browse, filter, follow, personalized calendar, and `.ics` download
+- [ ] Expand backend coverage from the current 77%, starting with `clubs.py` at 55%, and agree on a target with the team
+- [ ] Complete the remaining checks: calendar (#34), and full demo (#35)
+- [ ] `[Proposed]` Add contract tests that check every endpoint's response against the agreed schemas
 
 ### PM / DevOps (Tanzina)
 
-- [ ] Run the team's review of the API contract and record the outcome
-- [ ] Assign owners for the single-club endpoint, database, and authentication
-- [ ] Pick the frontend host, backend host, and managed Postgres provider
+- [ ] Run the team's review of the draft contract and record each decision
+- [ ] Make sure Yazmyrat has confirmed the format before #27 is closed
+- [ ] Confirm the owners of the events and clubs work in #57 (see the tracking notes in section 3)
+- [ ] Assign owners for the single-club endpoint and error handling, and for the database and authentication if approved
+- [ ] Decide on the frontend host, backend host, and database provider
 - [ ] Make `frontend-tests` a required check after #53 merges (#48)
-- [ ] Wire deployment into GitHub Actions, with production settings stored as secrets
-- [ ] Set up monitoring once deployed, starting with uptime checks on `/api/health` and error logging
 - [ ] Update `FEATURES.md` and the README's stack and setup sections
 - [ ] Add the real deadline and project board link to the docs
 - [ ] Prepare the final demo (#5)
+- [ ] `[Proposed]` Once hosting is chosen, wire deployment into GitHub Actions, with production settings stored as secrets
+- [ ] `[Proposed]` Once deployed, set up monitoring, starting with uptime checks on `/api/health` and error logging
 
 ## 6. Key open decisions
 
-| # | Decision | Current position | Blocks | Needed by |
-|---|---|---|---|---|
-| 1 | **API contract and data format** | Draft ready in `API_CONTRACT.md` | **Almost everything:** #57, frontend integration, QA test updates | Now |
-| 2 | **Authentication: demo or real** | Leaning real. The contract supports demo first, then real. | Users table, sign-in UI, personalized view for real users | Now |
-| 3 | **Database** | Leaning Postgres | Models, auth, persistent follows | Before auth starts |
-| 4 | **Deployment platform** | Not decided | CI deployment, production config, monitoring. Also the managed database choice. | Before auth starts |
-| 5 | Token or cookie sessions | Contract proposes bearer tokens | Auth implementation | With decision 2 |
-| 6 | `.ics`: frontend only or also backend | Contract proposes keeping the frontend version | PR #56, #23 | Soon |
-| 7 | Source of real club and event data | Unknown. Already an open question in `FEATURES.md`. | Moving beyond sample data, and the "not a demo" goal | Before final demo |
-| 8 | Can club officers post events? | Open | Roles, and create and edit endpoints, which are not in the contract | Before final demo |
-| 9 | Scope of RSVP and Google integrations | RSVP unconfirmed. Google Calendar and Google sign-in not started. | Only scope. Suggest cutting unless time remains. | Soon |
-| 10 | Product name | ClubSync vs. Campus Groups | Nothing technical | Before deployment |
+**None of these are finalized.** "Proposal" is a starting point for discussion, not an approved direction.
+
+| # | Decision | On `main` today | Proposal | Blocks | Needed by |
+|---|---|---|---|---|---|
+| 1 | **API contract and data format (#27)** | Two different formats | Draft in `API_CONTRACT.md`. **Needs Yazmyrat's confirmation.** | **Almost everything:** #57, frontend integration, QA test updates | Now |
+| 2 | **Authentication: demo or real** | Demo user, no accounts | Real accounts, after demo-user work | Users table, sign-in UI, personalized view for real users | Now |
+| 3 | **Database** | None | Postgres | Models, real accounts, persistent follows | Before auth work starts |
+| 4 | **Deployment platform** | None | None yet | CI deployment, production config, monitoring, and the managed database choice | Before auth work starts |
+| 5 | Token or cookie sessions | None | Bearer tokens | Auth implementation | With decision 2 |
+| 6 | `.ics`: frontend only or also backend | Frontend only | Keep the frontend version, with the backend as optional | PR #56, #23 | Soon |
+| 7 | Source of real club and event data | Fictional sample files | None yet. Already an open question in `FEATURES.md`. | Moving beyond sample data, and the "not a demo" goal | Before final demo |
+| 8 | Can club officers post events? | No | None yet | Roles, and create and edit endpoints, which are not in the contract | Before final demo |
+| 9 | Scope of RSVP and Google integrations | Not built | Cut unless time remains | Only scope | Soon |
+| 10 | Product name | ClubSync and Campus Groups both used | None yet | Nothing technical | Before deployment |
+
+**Decision 1 and #27:** this PR's docs can merge as a draft, but merging does not complete #27. #27 stays open until Yazmyrat, its assignee and the data owner, confirms the club and event format, including any requested changes.
 
 ## 7. Suggested sequence
 
-1. **Agree on the contract.** Review `API_CONTRACT.md`, settle decisions 1 and 2, and close #27.
-2. **Clear the review queue.** Merge #51, then #59, #60, and #62. Finish #55. This avoids building on top of open conflicts.
-3. **Make the data canonical.** Migrate the club categories and add validation (#29).
-4. **Serve the real data.** Move backend routes onto the loaders, add the missing endpoints, and update the tests together (#57).
+`[Proposed]` A suggested order, not an approved plan. Steps 6, 8, and 9 depend on decisions that have not been made.
+
+1. **Agree on the contract.** Review `API_CONTRACT.md`, settle decisions 1 and 2, and get Yazmyrat's confirmation so #27 can close.
+2. **Clear the review queue.** #50, #51, #54, #59, #60, and #62 are merged. Finish #55, decide on #61 and #56, and finish #53.
+3. **Make the data canonical.** Apply the confirmed format and add validation (#29).
+4. **Serve the real data.** Move backend routes off the in-memory records, add the missing endpoints, and update the tests together (#57).
 5. **Connect the frontend to the API.** Replace the bundled data in `services/data.js` (#3). This is the point where the project first works end to end.
 6. **Deploy a first version.** Choose hosts by this step. An early deployment finds CORS and configuration problems while they are still small, and gives every later step a real environment to test in.
 7. **Add follows and personalization for the demo user.** Follow buttons, club pages, and the personalized view (#58).
-8. **Add the database, then real accounts.** Move data and follows into the database, then add sign-up, login, and protected endpoints, then the frontend sign-in flow.
+8. **If approved, add the database, then real accounts.** Move data and follows into the database, then add sign-up, login, and protected endpoints, then the frontend sign-in flow.
 9. **Finish production setup.** Automated deployment, monitoring, and restricted CORS.
 10. **Replace sample data and run the final test.** Bring in real or refreshed data, run the complete demo test (#35), and prepare the demo (#5).
 
-**What can start in parallel now:** the deployment and database decisions, QA test PRs, frontend CI (#53), and frontend coverage work on `directory.js` and pages.
+**What can start in parallel now:** the deployment and database decisions, #53, #61, and frontend coverage work on `directory.js` and pages.

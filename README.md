@@ -52,7 +52,7 @@ The backend team collaborates on API/server logic, database management, authenti
 
 ### Run the web app
 
-Install Node.js 20.19+ (or 22.12+). From the repository root:
+Install Node.js 22.12+ (an even-numbered release: 22.12+, 24, or 26+). From the repository root:
 
 ```bash
 cd frontend
@@ -66,10 +66,11 @@ The frontend loads `data/sample_events.json` and `data/sample_clubs.json` direct
 
 The sample schedule runs from November 16 to December 8, 2026. The calendar initially shows November 16–22 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
 
-From `frontend/`, run the frontend checks or build a production bundle:
+From `frontend/`, run the frontend checks (`npm run coverage` adds a coverage report) or build a production bundle:
 
 ```bash
 npm test
+npm run coverage
 npm run build
 npm run preview
 ```

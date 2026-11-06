@@ -10,15 +10,16 @@ sys.path.insert(
 from services.demo_user import (
     DEMO_USER,
     follow_club,
-    unfollow_club
+    unfollow_club,
+    reset_demo_user
 )
 
 
 class TestClubFollowing(unittest.TestCase):
 
     def setUp(self):
-        # Clear followed clubs before every test.
-        DEMO_USER["followed_clubs"].clear()
+    # Reset demo user before every test.
+        reset_demo_user()
 
     def test_follow_club(self):
         # Following a club adds it to the list.

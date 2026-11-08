@@ -26,7 +26,7 @@ async function request(method, path) {
       data = await response.json();
     } catch (error) {
       // Keep the timeout active until the response body has finished loading.
-      if (controller.signal.aborted) throw error;
+      if (controller.signal.aborted || !(error instanceof SyntaxError)) throw error;
       throw new ApiError(response.ok ? 'Invalid JSON response' : `Request failed (HTTP ${response.status})`, response.status);
     }
 

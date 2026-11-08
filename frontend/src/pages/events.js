@@ -12,8 +12,7 @@ export function eventsPage(params) {
     <div class="page-heading"><h1>Campus events</h1><p id="events-count" role="status" aria-live="polite"></p></div>
     <div class="filters">
       <label class="search-box">${icon('search')}<input id="event-search" type="search" placeholder="Search events, clubs, places…" aria-label="Search events, clubs, places" value="${h(filters.search)}" autocomplete="off"></label>
-      <div class="filter-row"><div class="category-filters" aria-label="Filter events by category">${['All', 'Academic', 'Arts', 'Cultural', 'Faith', 'Sports', 'Tech'].map(category => `<button class="filter-pill ${categoryClass(category)}" data-category="${category}" aria-pressed="${filters.category === category}">${category}</button>`).join('')}
-      ${CATEGORIES.includes(filters.category) && !['Academic', 'Arts', 'Cultural', 'Faith', 'Sports', 'Tech'].includes(filters.category) ? `<button class="filter-pill ${categoryClass(filters.category)}" data-category="${h(filters.category)}" aria-pressed="true">${h(filters.category)}</button>` : ''}</div>
+      <div class="filter-row"><div class="category-filters" aria-label="Filter events by category">${['All', ...CATEGORIES].map(category => `<button class="filter-pill ${categoryClass(category)}" data-category="${category}" aria-pressed="${filters.category === category}">${category}</button>`).join('')}</div>
       <label class="club-select"><span class="sr-only">Filter by club</span><select id="club-filter"><option value="all">All clubs</option>${clubs.map(club => `<option value="${club.id}" ${String(club.id) === filters.club ? 'selected' : ''}>${h(club.name)}</option>`).join('')}</select></label></div>
     </div>
     <div id="events-results" class="timeline"></div>

@@ -109,6 +109,20 @@ describe('V1 API client', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
+  it('reports a body-read network failure after successful headers as a network error', async () => {
+    const body = new ReadableStream({
+      start(controller) {
+        controller.error(new TypeError('Connection terminated'));
+      },
+    });
+    fetch.mockResolvedValue(new Response(body, { status: 200 }));
+
+    const failure = getMe();
+    await expect(failure).rejects.toBeInstanceOf(ApiError);
+    await expect(failure).rejects.toMatchObject({ message: 'Network request failed', status: null });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it.each(['headers', 'body'])('aborts after 15 seconds while waiting for %s', async phase => {
     let signal;
     fetch.mockImplementation((_url, options) => {

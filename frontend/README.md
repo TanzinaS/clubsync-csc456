@@ -39,6 +39,14 @@ The calendar opens on the first sample event's week, November 16–22, and label
 
 The existing Flask endpoints use separate sample records and a simpler schema. Future API integration belongs in `src/services/data.js`.
 
+## API client / env setup
+
+`src/services/api.js` provides `apiGet(path)` and bodyless `apiPost(path)`, plus `getClubs()`, `getEvents()`, `getMe()`, `getPersonalizedEvents()`, `followClub(id)`, and `unfollowClub(id)` for the V1 contract. Pages still use bundled data; connecting them is tracked separately in #93.
+
+To configure the client, copy `.env.example` to `.env` in `frontend/` and set `VITE_API_BASE_URL` to the backend origin (without `/api`). Empty or unset uses `http://127.0.0.1:5001`. Restart Vite after editing `.env`; production values are embedded at build time, so changes require a rebuild/redeploy. This value is public and must not contain secrets.
+
+Requests accept JSON, send no authentication token, and time out after 15 seconds, including reading the response body. V1 POSTs have no body and need no `Content-Type` header. Failures throw `ApiError`: `message` preserves the API's `{ "error": "..." }` text and `status` carries the HTTP status, or `null` for network failures/timeouts. Invalid JSON and non-JSON HTTP errors also produce `ApiError`. Client tests mock `fetch` and require no running backend.
+
 ## Checks and production build
 
 From `frontend/`:

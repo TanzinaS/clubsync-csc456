@@ -20,9 +20,22 @@ export function eventsPage(params) {
   </section>`;
 }
 
+// Timestamps carry their New York offset (API_CONTRACT 3.3), so comparing instants is
+// zone-independent. An event stays upcoming until its end_time has passed.
+export const isUpcoming = (event, now = new Date()) => new Date(event.end_time) > now;
+
+export function eventResults(filters, { source = events, now = new Date() } = {}) {
+  const upcoming = source.filter(event => isUpcoming(event, now));
+  const filtered = filterEvents(upcoming, filters);
+  const count = `${filtered.length} upcoming event${filtered.length === 1 ? '' : 's'}`;
+  if (filtered.length) return { count, html: timeline(groupByDay(filtered)) };
+  if (!upcoming.length) return { count, html: `<div class="empty-state">${icon('calendar')}<h2>No upcoming events</h2><p>Nothing is scheduled yet. Check back soon, or look back at past weeks on the calendar.</p><a class="button dark" href="#/calendar">Open the calendar</a></div>` };
+  return { count, html: `<div class="empty-state">${icon('search')}<h2>No events found</h2><p>Try a different search or make a little more room in your filters.</p><button class="button dark" data-clear-events>Clear filters</button></div>` };
+}
+
 export function updateEventResults(filters) {
-  const filtered = filterEvents(events, filters);
-  document.querySelector('#events-count').textContent = `${filtered.length} upcoming event${filtered.length === 1 ? '' : 's'}`;
-  document.querySelector('#events-results').innerHTML = filtered.length ? timeline(groupByDay(filtered)) : `<div class="empty-state">${icon('search')}<h2>No events found</h2><p>Try a different search or make a little more room in your filters.</p><button class="button dark" data-clear-events>Clear filters</button></div>`;
+  const { count, html } = eventResults(filters);
+  document.querySelector('#events-count').textContent = count;
+  document.querySelector('#events-results').innerHTML = html;
   document.querySelectorAll('[data-category]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === filters.category)));
 }

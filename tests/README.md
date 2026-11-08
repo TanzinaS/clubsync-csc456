@@ -10,16 +10,20 @@ Developers are also expected to test their own work before opening a pull reques
 
 | Folder | Purpose |
 |---|---|
-| `frontend/` | Tests for UI pages and components |
-| `backend/` | Tests for API endpoints, backend logic, and server startup |
+| `tests/backend/` | Python tests for backend API endpoints and logic |
+| `frontend/tests/` | JavaScript tests for frontend functionality |
 
-Both `tests/backend/` and `tests/frontend/` contain an empty `__init__.py` file to allow Python's `unittest` framework to discover tests in subdirectories.
+The `tests/backend/` directory contains an empty `__init__.py` file to allow Python's `unittest` framework to discover backend tests in subdirectories.
+
+Frontend tests are stored separately in `frontend/tests/` and are run using Node.js and npm.
 
 ## Automated Testing
 
-ClubSync uses Python's built-in `unittest` framework for backend testing.
+ClubSync uses Python's built-in `unittest` framework for backend testing and Node.js's built-in test runner for frontend testing.
 
 Backend tests should be placed in `tests/backend/` and follow the naming convention `test_*.py`.
+
+Frontend tests should be placed in `frontend/tests/` and follow the naming convention `*.test.js`.
 
 ### Running All Python Tests
 
@@ -39,25 +43,20 @@ To run tests located in the backend test directory, use:
 python -m unittest discover -s tests/backend -p "test_*.py" -v
 ```
 
-### Expected Results
+### Running Frontend Tests
 
-A successful test run should display the discovered tests followed by `OK`.
+From the project's root directory, run:
 
-For example:
-
-```text
-test_backend_discovery ... ok
-test_get_clubs ... ok
-test_get_events ... ok
-test_health ... ok
-test_home ... ok
-
-Ran 5 tests
-
-OK
+```bash
+cd frontend
+npm test
 ```
 
-The `test_backend_discovery` test is only an example used to verify discovery and does not need to remain in the repository.
+This command runs the JavaScript tests located in `frontend/tests/`.
+
+### Expected Results
+
+A successful test run should display the discovered tests followed by `OK` for Python tests, or a summary of passing tests for JavaScript tests.
 
 Before submitting a pull request, developers should run the relevant automated tests and confirm that all tests pass.
 

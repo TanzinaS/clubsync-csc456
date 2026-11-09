@@ -1,14 +1,14 @@
 import unittest
 
-from backend.app import create_app
-from services.demo_user import DEMO_USER
+from app import create_app
+from services.demo_user import reset_demo_user
 
 class TestCurrentUser(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app()
         self.client = self.app.test_client()
-        DEMO_USER["followed_clubs"].clear()
+        reset_demo_user()
 
     def test_get_current_user(self):
         response = self.client.get("/api/me")

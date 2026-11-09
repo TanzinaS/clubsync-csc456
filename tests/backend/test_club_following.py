@@ -7,6 +7,7 @@ sys.path.insert(
     0, str(Path(__file__).resolve().parents[2] / "backend")
 )
 
+from app import create_app
 from services.demo_user import (
     DEMO_USER,
     follow_club,
@@ -18,13 +19,12 @@ from services.demo_user import (
 class TestClubFollowing(unittest.TestCase):
 
     def setUp(self):
-    # Reset demo user before every test.
+        # Reset demo user before every test.
         reset_demo_user()
 
     def test_follow_club(self):
         # Following a club adds it to the list.
         follow_club(1)
-
         self.assertIn(1, DEMO_USER["followed_clubs"])
 
     def test_follow_club_no_duplicates(self):
@@ -45,13 +45,21 @@ class TestClubFollowing(unittest.TestCase):
         self.assertNotIn(1, DEMO_USER["followed_clubs"])
 
     def test_unfollow_club_not_followed(self):
-        # Unfollowing an unknown club shouldn't cause an error.
         unfollow_club(99)
 
         self.assertEqual(
             DEMO_USER["followed_clubs"],
             []
         )
+
+    def test_follow_club_6_api(self):
+        app = create_app()
+        client = app.test_client()
+
+        response = client.post("/api/clubs/6/follow")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(6, response.get_json()["followed_clubs"])
 
 
 if __name__ == "__main__":

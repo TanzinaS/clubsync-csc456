@@ -24,3 +24,16 @@ Never hard-code API keys, database passwords, or OAuth secrets. Load them from e
 ## Setup
 
 See the root README's [setup instructions](../README.md#setup) for virtual environment setup, dependency installation, starting the API, and running tests.
+
+
+## Demo User Limitations (V1)
+
+ClubSync currently uses a single demo user stored in memory.
+
+- All visitors share the same demo user and followed clubs.
+- Followed clubs are lost whenever the Flask server restarts.
+- The in-memory demo user is not stored in a database.
+- V1 requires a single server worker because multiple workers would maintain separate copies of the demo user.
+- The reset_demo_user() function clears followed clubs before tests to prevent tests from affecting one another.
+
+    These limitations are temporary until persistent user accounts and database storage are implemented.

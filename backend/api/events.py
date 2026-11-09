@@ -1,8 +1,9 @@
 
-from datetime import date
+from datetime import date, datetime
 
 from flask import Blueprint, jsonify, request
 from services.demo_user import get_demo_user
+from services.sample_data import load_sample_events
 
 events_bp = Blueprint("events", __name__)
 
@@ -35,33 +36,33 @@ EVENTS = [
 ]
 
 
+
 # Issues #15 and #17: Return upcoming events,
 # optionally filtered by club ID.
 @events_bp.get("/api/events")
 def get_events():
-    today = date.today().isoformat()
+    events = load_sample_events()
 
-    upcoming_events = [
-        event for event in EVENTS
-        if event["date"] >= today
-    ]
-
-    club_id = request.args.get("club_id")
+    club_id = request.args.get("club_id", type=int)
 
     if club_id is not None:
-        try:
-            club_id = int(club_id)
-        except ValueError:
-            return jsonify({
-                "error": "Invalid club_id"
-            }), 400
-
-        upcoming_events = [
-            event for event in upcoming_events
+        events = [
+            event for event in events
             if event["club_id"] == club_id
         ]
 
-    return jsonify(upcoming_events), 200
+    events = sorted(
+        events,
+        key=lambda event: (
+            datetime.fromisoformat(
+                event["start_time"].replace("Z", "+00:00")
+            ),
+            event["id"]
+        )
+    )
+
+    return jsonify(events)
+
 
 
 @events_bp.get("/api/events/personalized")
@@ -83,7 +84,9 @@ def get_personalized_events():
 # Issue #16: Return a specific event by its ID.
 @events_bp.get("/api/events/<int:event_id>")
 def get_event_details(event_id):
-    for event in EVENTS:
+    events = load_sample_events()
+
+    for event in events:
         if event["id"] == event_id:
             return jsonify(event), 200
 

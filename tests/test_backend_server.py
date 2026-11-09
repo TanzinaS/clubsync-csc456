@@ -48,20 +48,31 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(clubs[1]["name"], "Robotics Club")
         self.assertEqual(clubs[2]["name"], "Photography Club")
 
-    # Pretend today is before all sample events.
-    @patch("api.events.date")
-    def test_get_events(self, mock_date):
-        mock_date.today.return_value = date(2026, 1, 1)
-
+    def test_get_events(self):
         response = self.client.get("/api/events")
 
         self.assertEqual(response.status_code, 200)
 
         events = response.get_json()
-        self.assertEqual(len(events), 3)
-        self.assertEqual(events[0]["title"], "Computer Science Workshop")
-        self.assertEqual(events[1]["title"], "Robotics Competition")
-        self.assertEqual(events[2]["title"], "Photography Walk")
+
+        # Check all 12 events are returned.
+        self.assertEqual(len(events), 12)
+
+        # Check events are sorted by start_time, then ID.
+        expected = sorted(
+            events,
+            key=lambda event: (event["start_time"], event["id"])
+        )
+        self.assertEqual(events, expected)
+
+        # Check every event has the required fields.
+        required_fields = {
+            "id", "club_id", "title", "description",
+            "location", "start_time", "end_time", "tags"
+        }
+
+        for event in events:
+            self.assertTrue(required_fields.issubset(event.keys()))
 
     # Issue #16: Return the requested event by ID.
     def test_get_event_details(self):
@@ -70,15 +81,18 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         event = response.get_json()
+
         self.assertEqual(event["id"], 2)
-        self.assertEqual(event["club_id"], 2)
-        self.assertEqual(event["title"], "Robotics Competition")
-        self.assertEqual(event["date"], "2026-11-12")
-        self.assertEqual(event["location"], "CCNY Campus")
-        self.assertEqual(
-            event["description"],
-            "Join a robotics competition."
+
+        # Verify event details match the shared JSON data.
+        from services.sample_data import load_sample_events
+
+        expected_event = next(
+            event for event in load_sample_events()
+            if event["id"] == 2
         )
+
+        self.assertEqual(event, expected_event)
 
     # Issue #16: Invalid event IDs return 404.
     def test_get_event_details_not_found(self):
@@ -91,10 +105,7 @@ class TestBackendServer(unittest.TestCase):
         )
 
     # Issue #17: Filter events by Club 1.
-    @patch("api.events.date")
-    def test_filter_events_by_club_1(self, mock_date):
-        mock_date.today.return_value = date(2026, 1, 1)
-
+    def test_filter_events_by_club_1(self):
         response = self.client.get("/api/events?club_id=1")
 
         self.assertEqual(response.status_code, 200)
@@ -102,16 +113,10 @@ class TestBackendServer(unittest.TestCase):
         events = response.get_json()
         self.assertEqual(len(events), 1)
         self.assertEqual(events[0]["club_id"], 1)
-        self.assertEqual(
-            events[0]["title"],
-            "Computer Science Workshop"
-        )
+        self.assertEqual(events[0]["title"], "Proofs & Pastries")
 
     # Issue #17: Filter events by Club 2.
-    @patch("api.events.date")
-    def test_filter_events_by_club_2(self, mock_date):
-        mock_date.today.return_value = date(2026, 1, 1)
-
+    def test_filter_events_by_club_2(self):
         response = self.client.get("/api/events?club_id=2")
 
         self.assertEqual(response.status_code, 200)
@@ -119,16 +124,10 @@ class TestBackendServer(unittest.TestCase):
         events = response.get_json()
         self.assertEqual(len(events), 1)
         self.assertEqual(events[0]["club_id"], 2)
-        self.assertEqual(
-            events[0]["title"],
-            "Robotics Competition"
-        )
+        self.assertEqual(events[0]["title"], "Roblox Game Jam")
 
     # Issue #17: A club with no events returns an empty list.
-    @patch("api.events.date")
-    def test_filter_events_invalid_club(self, mock_date):
-        mock_date.today.return_value = date(2026, 1, 1)
-
+    def test_filter_events_invalid_club(self):
         response = self.client.get("/api/events?club_id=999")
 
         self.assertEqual(response.status_code, 200)

@@ -3,7 +3,7 @@ from datetime import date, datetime
 
 from flask import Blueprint, jsonify, request
 from services.demo_user import get_demo_user
-from services.sample_data import load_sample_events
+from services.sample_data import load_sample_events, sorted_events
 
 events_bp = Blueprint("events", __name__)
 
@@ -43,26 +43,21 @@ EVENTS = [
 def get_events():
     events = load_sample_events()
 
-    club_id = request.args.get("club_id", type=int)
+    club_id = request.args.get("club_id")
 
     if club_id is not None:
+        try:
+            club_id = int(club_id)
+        except ValueError:
+            return jsonify({"error": "Invalid club_id"}), 400
+
         events = [
             event for event in events
             if event["club_id"] == club_id
         ]
 
-    events = sorted(
-        events,
-        key=lambda event: (
-            datetime.fromisoformat(
-                event["start_time"].replace("Z", "+00:00")
-            ),
-            event["id"]
-        )
-    )
-
+    events = sorted_events(events)
     return jsonify(events)
-
 
 
 @events_bp.get("/api/events/personalized")

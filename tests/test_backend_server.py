@@ -1,15 +1,15 @@
 
 import sys
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 import unittest
-from unittest.mock import patch
 
 sys.path.insert(
     0, str(Path(__file__).resolve().parents[1] / "backend")
 )
 
 from app import create_app
+from services.sample_data import load_sample_events
 
 
 class TestBackendServer(unittest.TestCase):
@@ -55,17 +55,22 @@ class TestBackendServer(unittest.TestCase):
 
         events = response.get_json()
 
-        # Check all 12 events are returned.
+        # All 12 shared events must be returned.
         self.assertEqual(len(events), 12)
 
-        # Check events are sorted by start_time, then ID.
+        # Sort by actual datetime, then event ID.
         expected = sorted(
-            events,
-            key=lambda event: (event["start_time"], event["id"])
+            load_sample_events(),
+            key=lambda event: (
+                datetime.fromisoformat(
+                    event["start_time"].replace("Z", "+00:00")
+                ),
+                event["id"]
+            )
         )
         self.assertEqual(events, expected)
 
-        # Check every event has the required fields.
+        # All required fields must be present.
         required_fields = {
             "id", "club_id", "title", "description",
             "location", "start_time", "end_time", "tags"
@@ -74,18 +79,29 @@ class TestBackendServer(unittest.TestCase):
         for event in events:
             self.assertTrue(required_fields.issubset(event.keys()))
 
-    # Issue #16: Return the requested event by ID.
+    # Issue #82: Event 12 must appear before event 11.
+    def test_events_chronological_order(self):
+        response = self.client.get("/api/events")
+
+        self.assertEqual(response.status_code, 200)
+
+        event_ids = [
+            event["id"] for event in response.get_json()
+        ]
+
+        self.assertLess(
+            event_ids.index(12),
+            event_ids.index(11)
+        )
+
+    # Issue #82: Return event details from shared JSON.
     def test_get_event_details(self):
         response = self.client.get("/api/events/2")
 
         self.assertEqual(response.status_code, 200)
 
         event = response.get_json()
-
         self.assertEqual(event["id"], 2)
-
-        # Verify event details match the shared JSON data.
-        from services.sample_data import load_sample_events
 
         expected_event = next(
             event for event in load_sample_events()
@@ -94,17 +110,16 @@ class TestBackendServer(unittest.TestCase):
 
         self.assertEqual(event, expected_event)
 
-    # Issue #16: Invalid event IDs return 404.
+    # Unknown event IDs must return JSON 404.
     def test_get_event_details_not_found(self):
         response = self.client.get("/api/events/999")
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(
-            response.get_json()["error"],
-            "Event not found"
+            response.get_json(),
+            {"error": "Event not found"}
         )
 
-    # Issue #17: Filter events by Club 1.
     def test_filter_events_by_club_1(self):
         response = self.client.get("/api/events?club_id=1")
 
@@ -115,7 +130,6 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(events[0]["club_id"], 1)
         self.assertEqual(events[0]["title"], "Proofs & Pastries")
 
-    # Issue #17: Filter events by Club 2.
     def test_filter_events_by_club_2(self):
         response = self.client.get("/api/events?club_id=2")
 
@@ -126,12 +140,37 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(events[0]["club_id"], 2)
         self.assertEqual(events[0]["title"], "Roblox Game Jam")
 
-    # Issue #17: A club with no events returns an empty list.
+    # Issue #82: Club 6 has event 3.
+    def test_filter_events_by_club_6(self):
+        response = self.client.get("/api/events?club_id=6")
+
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["id"], 3)
+        self.assertEqual(events[0]["club_id"], 6)
+        self.assertEqual(
+            events[0]["title"],
+            "Build Night: Line-Following Bots"
+        )
+
+    # A club with no events returns an empty list.
     def test_filter_events_invalid_club(self):
         response = self.client.get("/api/events?club_id=999")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), [])
+
+    # Invalid club IDs must return HTTP 400.
+    def test_filter_events_invalid_club_id(self):
+        response = self.client.get("/api/events?club_id=abc")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.get_json(),
+            {"error": "Invalid club_id"}
+        )
 
 
 if __name__ == "__main__":

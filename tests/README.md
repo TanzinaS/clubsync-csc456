@@ -15,11 +15,11 @@ Developers are also expected to test their own work before opening a pull reques
 
 The `tests/backend/` directory contains an empty `__init__.py` file to allow Python's `unittest` framework to discover backend tests in subdirectories.
 
-Frontend tests are stored separately in `frontend/tests/` and are run using Node.js and npm.
+Frontend tests are stored separately in `frontend/tests/` and are run using Vitest through npm.
 
 ## Automated Testing
 
-ClubSync uses Python's built-in `unittest` framework for backend testing and Node.js's built-in test runner for frontend testing.
+ClubSync uses Python's built-in `unittest` framework for backend testing and **Vitest** for frontend testing.
 
 Backend tests should be placed in `tests/backend/` and follow the naming convention `test_*.py`.
 
@@ -52,11 +52,11 @@ cd frontend
 npm test
 ```
 
-This command runs the JavaScript tests located in `frontend/tests/`.
+This command uses Vitest to run the JavaScript tests located in `frontend/tests/`.
 
 ### Expected Results
 
-A successful test run should display the discovered tests followed by `OK` for Python tests, or a summary of passing tests for JavaScript tests.
+A successful test run should display the discovered tests followed by `OK` for Python tests, or a summary of passing tests from Vitest for JavaScript tests.
 
 Before submitting a pull request, developers should run the relevant automated tests and confirm that all tests pass.
 

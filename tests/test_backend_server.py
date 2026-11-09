@@ -43,10 +43,18 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         clubs = response.get_json()
-        self.assertEqual(len(clubs), 3)
-        self.assertEqual(clubs[0]["name"], "Computer Science Club")
-        self.assertEqual(clubs[1]["name"], "Robotics Club")
-        self.assertEqual(clubs[2]["name"], "Photography Club")
+
+        # Verify that all 14 clubs are returned.
+        self.assertEqual(len(clubs), 14)
+
+        # Verify that every club has an ID and name.
+        for club in clubs:
+            self.assertIn("id", club)
+            self.assertIn("name", club)
+
+        # Verify that all club IDs are unique.
+        club_ids = [club["id"] for club in clubs]
+        self.assertEqual(len(club_ids), len(set(club_ids)))
 
     # Pretend today is before all sample events.
     @patch("api.events.date")

@@ -10,6 +10,7 @@ sys.path.insert(
 )
 
 from app import create_app
+from services.sample_data import load_sample_clubs
 
 
 class TestBackendServer(unittest.TestCase):
@@ -58,6 +59,14 @@ class TestBackendServer(unittest.TestCase):
 
         for club in clubs:
             self.assertTrue(required_fields.issubset(club.keys()))
+
+        # Verify actual club data matches the shared JSON.
+        expected = sorted(
+            load_sample_clubs(),
+            key=lambda club: club["id"]
+        )
+        self.assertEqual(clubs, expected)
+        self.assertEqual(clubs[0]["name"], "Math Wizards")
 
     # Pretend today is before all sample events.
     @patch("api.events.date")

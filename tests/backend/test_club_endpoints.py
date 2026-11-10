@@ -29,6 +29,8 @@ class TestClubEndpoints(unittest.TestCase):
             self.assertIn("id", club)
             self.assertIn("name", club)
             self.assertIn("description", club)
+            self.assertIn("category", club)
+            self.assertIn("contact_email", club)
             ids.append(club["id"])
 
         self.assertEqual(
@@ -45,3 +47,4 @@ class TestClubEndpoints(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+ 

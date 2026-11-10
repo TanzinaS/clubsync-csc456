@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 from api.clubs import clubs_bp
 from api.events import events_bp
+from api.users import users_bp
 
 
 def create_app():
@@ -24,6 +25,7 @@ def create_app():
 
     app.register_blueprint(clubs_bp)
     app.register_blueprint(events_bp)
+    app.register_blueprint(users_bp)
 
     @app.get("/")
     def home():

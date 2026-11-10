@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify
 from services.demo_user import unfollow_club
 from services.demo_user import follow_club
+from services.sample_data import load_sample_clubs
 
 clubs_bp = Blueprint("clubs", __name__)
 
@@ -27,7 +28,9 @@ CLUBS = [
 
 @clubs_bp.get("/api/clubs")
 def get_clubs():
-    return jsonify(CLUBS)
+    clubs = load_sample_clubs()
+    clubs = sorted(clubs, key=lambda club: club["id"])
+    return jsonify(clubs)
 
 @clubs_bp.post("/api/clubs/<int:club_id>/follow")
 def follow_club_route(club_id):

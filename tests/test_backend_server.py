@@ -10,11 +10,13 @@ sys.path.insert(
 
 from app import create_app
 from services.sample_data import load_sample_events
+from services.demo_user import reset_demo_user
 
 
 class TestBackendServer(unittest.TestCase):
 
     def setUp(self):
+        reset_demo_user()
         self.app = create_app()
         self.app.config["TESTING"] = True
         self.client = self.app.test_client()
@@ -43,10 +45,17 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         clubs = response.get_json()
-        self.assertEqual(len(clubs), 3)
-        self.assertEqual(clubs[0]["name"], "Computer Science Club")
-        self.assertEqual(clubs[1]["name"], "Robotics Club")
-        self.assertEqual(clubs[2]["name"], "Photography Club")
+        # Verify that all 14 clubs are returned.
+        self.assertEqual(len(clubs), 14)
+
+        # Verify that every club has an ID and name.
+        for club in clubs:
+            self.assertIn("id", club)
+            self.assertIn("name", club)
+
+        # Verify that all club IDs are unique.
+        club_ids = [club["id"] for club in clubs]
+        self.assertEqual(len(club_ids), len(set(club_ids)))
 
     def test_get_events(self):
         response = self.client.get("/api/events")
@@ -172,6 +181,38 @@ class TestBackendServer(unittest.TestCase):
             {"error": "Invalid club_id"}
         )
 
+    # Issue #88: Following club 6 shows only its events.
+    def test_personalized_events_by_followed_club(self):
+        follow_response = self.client.post("/api/clubs/6/follow")
+        self.assertEqual(follow_response.status_code, 200)
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+
+        expected_events = [
+            event for event in load_sample_events()
+            if event["club_id"] == 6
+        ]
+
+        self.assertTrue(expected_events)
+        self.assertEqual(events, expected_events)
+
+    # Issue #88: Unfollowing club 6 removes its events.
+    def test_personalized_events_after_unfollow(self):
+        follow_response = self.client.post("/api/clubs/6/follow")
+        self.assertEqual(follow_response.status_code, 200)
+
+        response = self.client.get("/api/events/personalized")
+        self.assertTrue(response.get_json())
+
+        unfollow_response = self.client.post("/api/clubs/6/unfollow")
+        self.assertEqual(unfollow_response.status_code, 200)
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), [])
 
 if __name__ == "__main__":
     unittest.main()

@@ -38,15 +38,17 @@ class TestJsonErrors(unittest.TestCase):
         )
 
     def test_405_method_not_allowed(self):
-        response = self.client.delete(
-            "/api/clubs/1/follow"
-        )
+        response = self.client.delete("/api/clubs/1/follow")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(
             response.get_json(),
             {"error": "Method not allowed"}
         )
+
+        # Check that the Allow header is preserved.
+        self.assertIn("Allow", response.headers)
+        self.assertIn("POST", response.headers["Allow"])
 
     def test_500_internal_server_error(self):
         @self.app.get("/api/test-error")
@@ -100,6 +102,33 @@ class TestJsonErrors(unittest.TestCase):
         self.assertEqual(
             response.get_json(),
             {"error": "Data unavailable"}
+        )
+
+    def test_500_missing_clubs_data_file(self):
+        @self.app.get("/api/test-missing-clubs")
+        def test_missing_clubs():
+            from services.sample_data import load_sample_clubs
+            return load_sample_clubs()
+
+        with patch(
+            "pathlib.Path.open",
+            side_effect=FileNotFoundError("Missing clubs file")
+        ):
+            response = self.client.get("/api/test-missing-clubs")
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(
+            response.get_json(),
+            {"error": "Data unavailable"}
+        )
+
+    def test_400_invalid_event_club_id(self):
+        response = self.client.get("/api/events?club_id=abc")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.get_json(),
+            {"error": "Invalid club_id"}
         )
 
 

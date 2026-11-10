@@ -36,7 +36,11 @@ def create_app():
     # Issue #83: Return JSON for unsupported methods (405).
     @app.errorhandler(405)
     def method_not_allowed(error):
-        return jsonify({"error": "Method not allowed"}), 405
+        return (
+            jsonify({"error": "Method not allowed"}), 
+            405,
+            {"Allow": ", ".join(error.valid_methods or[])},
+        )
 
     # Issue #83: Return JSON when shared data is unavailable.
     @app.errorhandler(DataUnavailableError)

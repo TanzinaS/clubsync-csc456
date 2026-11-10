@@ -1,4 +1,4 @@
-import { clubs, events } from '../services/data.js';
+import { directory } from '../services/data.js';
 import { CATEGORIES, escapeHTML as h, filterEvents, groupByDay } from '../services/directory.js';
 import { categoryClass, icon, timeline } from '../components/ui.js';
 
@@ -13,7 +13,7 @@ export function eventsPage(params) {
     <div class="filters">
       <label class="search-box">${icon('search')}<input id="event-search" type="search" placeholder="Search events, clubs, places…" aria-label="Search events, clubs, places" value="${h(filters.search)}" autocomplete="off"></label>
       <div class="filter-row"><div class="category-filters" aria-label="Filter events by category">${['All', ...CATEGORIES].map(category => `<button class="filter-pill ${categoryClass(category)}" data-category="${category}" aria-pressed="${filters.category === category}">${category}</button>`).join('')}</div>
-      <label class="club-select"><span class="sr-only">Filter by club</span><select id="club-filter"><option value="all">All clubs</option>${clubs.map(club => `<option value="${club.id}" ${String(club.id) === filters.club ? 'selected' : ''}>${h(club.name)}</option>`).join('')}</select></label></div>
+      <label class="club-select"><span class="sr-only">Filter by club</span><select id="club-filter"><option value="all">All clubs</option>${directory.clubs.map(club => `<option value="${club.id}" ${String(club.id) === filters.club ? 'selected' : ''}>${h(club.name)}</option>`).join('')}</select></label></div>
     </div>
     <div id="events-results" class="timeline"></div>
     <p class="sample-note">A little inspiration for your week. Explore sample campus events.</p>
@@ -21,7 +21,7 @@ export function eventsPage(params) {
 }
 
 export function updateEventResults(filters) {
-  const filtered = filterEvents(events, filters);
+  const filtered = filterEvents(directory.events, filters);
   document.querySelector('#events-count').textContent = `${filtered.length} upcoming event${filtered.length === 1 ? '' : 's'}`;
   document.querySelector('#events-results').innerHTML = filtered.length ? timeline(groupByDay(filtered)) : `<div class="empty-state">${icon('search')}<h2>No events found</h2><p>Try a different search or make a little more room in your filters.</p><button class="button dark" data-clear-events>Clear filters</button></div>`;
   document.querySelectorAll('[data-category]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === filters.category)));

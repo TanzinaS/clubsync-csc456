@@ -1,7 +1,15 @@
+
+import sys
 import unittest
+from pathlib import Path
+
+sys.path.insert(
+    0, str(Path(__file__).resolve().parents[2] / "backend")
+)
 
 from app import create_app
 from services.demo_user import reset_demo_user
+
 
 class TestCurrentUser(unittest.TestCase):
 
@@ -21,7 +29,8 @@ class TestCurrentUser(unittest.TestCase):
         })
 
     def test_followed_clubs_updated(self):
-        self.client.post("/api/clubs/1/follow")
+        follow_response = self.client.post("/api/clubs/1/follow")
+        self.assertEqual(follow_response.status_code, 200)
 
         response = self.client.get("/api/me")
 

@@ -14,3 +14,17 @@ def load_sample_events():
     file_path = DATA_DIR / "sample_events.json"
     with file_path.open("r", encoding="utf-8") as file:
         return json.load(file)
+
+from datetime import datetime
+
+
+def sorted_events(events):
+    return sorted(
+        events,
+        key=lambda event: (
+            datetime.fromisoformat(
+                event["start_time"].replace("Z", "+00:00")
+            ),
+            event["id"]
+        )
+    )

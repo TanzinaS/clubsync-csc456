@@ -81,53 +81,38 @@ def create_app():
     def not_found(error):
         return jsonify({"error": "Not found"}), 404
 
-    # Issue #83: Return JSON for unsupported methods (405).
+    # Issue #83: Preserve the Allow header for HTTP 405.
     @app.errorhandler(405)
     def method_not_allowed(error):
         return (
-            jsonify({"error": "Method not allowed"}), 
+            jsonify({"error": "Method not allowed"}),
             405,
-            {"Allow": ", ".join(error.valid_methods or[])},
+            {"Allow": ", ".join(error.valid_methods or [])},
         )
 
-    # Issues #83 and #84: Log data errors without exposing details.
+    # Issues #83 and #84:
+    # Log shared-data errors without exposing details.
     @app.errorhandler(DataUnavailableError)
     def data_unavailable(error):
-        logger.exception(
+        logger.error(
             "Shared data unavailable: %s",
             request.path,
-            exc_info=(type(error), error, error.__traceback__)
+            exc_info=(
+                type(error),
+                error,
+                error.__traceback__
+            )
         )
-        return jsonify({"error": "Data unavailable"}), 500
 
-    # Issues #83 and #84: Log server errors and return safe JSON.
+        return jsonify({
+            "error": "Data unavailable"
+        }), 500
+
+    # Issues #83 and #84:
+    # Flask already logs unhandled exceptions.
+    # Avoid logging the same stack trace twice.
     @app.errorhandler(500)
     def internal_server_error(error):
-        original_error = getattr(
-            error, "original_exception", None
-        )
-
-        if original_error is not None:
-            logger.error(
-                "Internal server error: %s",
-                request.path,
-                exc_info=(
-                    type(original_error),
-                    original_error,
-                    original_error.__traceback__
-                )
-            )
-        else:
-            logger.error(
-                "Internal server error: %s",
-                request.path,
-                exc_info=(
-                    type(error),
-                    error,
-                    error.__traceback__
-                )
-            )
-
         return jsonify({
             "error": "Internal server error"
         }), 500

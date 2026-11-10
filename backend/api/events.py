@@ -1,5 +1,5 @@
 
-from datetime import date, datetime
+from datetime import date
 
 from flask import Blueprint, jsonify, request
 from services.demo_user import get_demo_user
@@ -37,8 +37,8 @@ EVENTS = [
 
 
 
-# Issues #15 and #17: Return upcoming events,
-# optionally filtered by club ID.
+# Issues #82: Return all events (paste and future),
+# optionally filtered by club ID and sorted chronologically.
 @events_bp.get("/api/events")
 def get_events():
     events = load_sample_events()

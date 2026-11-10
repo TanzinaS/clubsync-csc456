@@ -10,6 +10,10 @@ sys.path.insert(
 )
 
 from app import create_app
+from services.sample_data import (
+    load_sample_clubs,
+    DataUnavailableError,
+)
 
 
 class TestJsonErrors(unittest.TestCase):
@@ -46,7 +50,7 @@ class TestJsonErrors(unittest.TestCase):
             {"error": "Method not allowed"}
         )
 
-        # Check that the Allow header is preserved.
+        # Verify that the Allow header is preserved.
         self.assertIn("Allow", response.headers)
         self.assertIn("POST", response.headers["Allow"])
 
@@ -55,7 +59,6 @@ class TestJsonErrors(unittest.TestCase):
         def test_error():
             raise RuntimeError("Test server error")
 
-        # Allow Flask to handle the exception as HTTP 500.
         self.app.config["PROPAGATE_EXCEPTIONS"] = False
 
         response = self.client.get("/api/test-error")
@@ -107,7 +110,6 @@ class TestJsonErrors(unittest.TestCase):
     def test_500_missing_clubs_data_file(self):
         @self.app.get("/api/test-missing-clubs")
         def test_missing_clubs():
-            from services.sample_data import load_sample_clubs
             return load_sample_clubs()
 
         with patch(
@@ -121,6 +123,15 @@ class TestJsonErrors(unittest.TestCase):
             response.get_json(),
             {"error": "Data unavailable"}
         )
+
+    # Issue #83: Directly test the clubs data loader.
+    def test_clubs_loader_raises_data_unavailable(self):
+        with patch(
+            "pathlib.Path.open",
+            side_effect=FileNotFoundError("Missing clubs file")
+        ):
+            with self.assertRaises(DataUnavailableError):
+                load_sample_clubs()
 
     def test_400_invalid_event_club_id(self):
         response = self.client.get("/api/events?club_id=abc")

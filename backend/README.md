@@ -131,3 +131,22 @@ ClubSync currently uses a single demo user stored in memory.
 - The `reset_demo_user()` function clears followed clubs before tests to prevent tests from affecting one another.
 
 These limitations are temporary until persistent user accounts and database storage are implemented.
+
+
+### Environment Variables
+
+The Flask application does not automatically load variables
+from a `.env` file.
+
+For local development, export environment variables in
+the terminal before starting the backend.
+
+Example:
+
+    export FRONTEND_ORIGIN=http://localhost:5173
+    export FLASK_DEBUG=false
+
+For deployment on Render, configure environment variables
+in the Render dashboard under Environment.
+
+Keep Flask debug mode disabled in production.

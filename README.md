@@ -176,3 +176,13 @@ Full details: [CONTRIBUTING.md](CONTRIBUTING.md)
 ## Security
 
 Never commit API keys, passwords, tokens, or other credentials. Keep secrets in a local `.env` file, which is ignored by Git.
+
+### Flask Debug Mode
+
+Flask debug mode is disabled by default for safety.
+
+To enable debug mode during local development, set:
+
+FLASK_DEBUG=true
+
+Debug mode should remain disabled in production.

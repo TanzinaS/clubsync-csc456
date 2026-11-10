@@ -1,4 +1,3 @@
-
 import os
 
 from flask import Flask, jsonify
@@ -11,13 +10,17 @@ from api.events import events_bp
 def create_app():
     app = Flask(__name__)
 
-    # Issue #85: Allow only the configured frontend origin.
-    frontend_origin = os.getenv(
-        "FRONTEND_ORIGIN",
-        "http://localhost:5173"
-    )
+    # Issue #85: Allow configured frontend origins.
+    # Support both localhost addresses during local development.
+    default_origins = "http://127.0.0.1:5173,http://localhost:5173"
 
-    CORS(app, origins=[frontend_origin])
+    frontend_origins = [
+        origin.strip().rstrip("/")
+        for origin in os.getenv("FRONTEND_ORIGIN", default_origins).split(",")
+        if origin.strip()
+    ]
+
+    CORS(app, origins=frontend_origins)
 
     app.register_blueprint(clubs_bp)
     app.register_blueprint(events_bp)

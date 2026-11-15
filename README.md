@@ -109,7 +109,7 @@ With the virtual environment activated, run this from the repository root:
 python backend/app.py
 ```
 
-The development server starts at **http://127.0.0.1:5001** with debug mode and automatic reload enabled. Stop it with **Ctrl+C**. When returning to the project in a new terminal, activate the virtual environment again before starting the server.
+The development server starts at **http://127.0.0.1:5001** with debug mode disabled by default. To enable debug mode and automatic reload during local development, set FLASK_DEBUG=true before starting the server. Stop it with **Ctrl+C**. When returning to the project in a new terminal, activate the virtual environment again before starting the server.
 
 Available endpoints:
 

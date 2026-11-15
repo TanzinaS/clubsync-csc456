@@ -1,4 +1,3 @@
-
 import sys
 from pathlib import Path
 import unittest
@@ -9,7 +8,11 @@ sys.path.insert(
 )
 
 from app import create_app
-from services.sample_data import load_sample_events, sorted_events
+from services.sample_data import (
+    load_sample_clubs,
+    load_sample_events,
+    sorted_events,
+)
 
 
 class TestBackendServer(unittest.TestCase):
@@ -43,10 +46,31 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         clubs = response.get_json()
-        self.assertEqual(len(clubs), 3)
-        self.assertEqual(clubs[0]["name"], "Computer Science Club")
-        self.assertEqual(clubs[1]["name"], "Robotics Club")
-        self.assertEqual(clubs[2]["name"], "Photography Club")
+        self.assertEqual(len(clubs), 14)
+
+        # Check that clubs are sorted by ID.
+        ids = [club["id"] for club in clubs]
+        self.assertEqual(ids, sorted(ids))
+        self.assertEqual(len(ids), len(set(ids)))
+
+        # Check that all required fields are included.
+        required_fields = {
+            "id", "name", "category",
+            "description", "contact_email"
+        }
+
+        for club in clubs:
+            self.assertTrue(
+                required_fields.issubset(club.keys())
+            )
+
+        expected = sorted(
+            load_sample_clubs(),
+            key=lambda club: club["id"]
+        )
+
+        self.assertEqual(clubs, expected)
+        self.assertEqual(clubs[0]["name"], "Math Wizards")
 
     def test_get_events(self):
         response = self.client.get("/api/events")
@@ -58,7 +82,7 @@ class TestBackendServer(unittest.TestCase):
         # All 12 shared events must be returned.
         self.assertEqual(len(events), 12)
 
-        # Verify the exact chronological event order.
+        # Verify chronological event order.
         expected_ids = [
             1, 2, 3, 4, 5, 6,
             7, 8, 9, 10, 12, 11
@@ -67,7 +91,7 @@ class TestBackendServer(unittest.TestCase):
         actual_ids = [event["id"] for event in events]
         self.assertEqual(actual_ids, expected_ids)
 
-        # All required fields must be present.
+        # Check required event fields.
         required_fields = {
             "id",
             "club_id",
@@ -123,8 +147,7 @@ class TestBackendServer(unittest.TestCase):
             [past_event]
         )
 
-    # Issue #82: Events must be sorted by actual
-    # chronological time across different time zones.
+    # Issue #82: Sort by actual chronological time.
     def test_events_different_timezones(self):
         events = [
             {
@@ -149,8 +172,7 @@ class TestBackendServer(unittest.TestCase):
 
         self.assertEqual(actual_ids, [2, 3, 1])
 
-    # Issue #82: Events with identical start times
-    # must be sorted by event ID.
+    # Issue #82: Same start time sorts by event ID.
     def test_events_same_start_time(self):
         events = [
             {

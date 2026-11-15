@@ -1,3 +1,4 @@
+
 import sys
 from pathlib import Path
 import unittest
@@ -64,6 +65,7 @@ class TestBackendServer(unittest.TestCase):
                 required_fields.issubset(club.keys())
             )
 
+        # Verify actual club data matches the shared JSON.
         expected = sorted(
             load_sample_clubs(),
             key=lambda club: club["id"]

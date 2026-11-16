@@ -76,6 +76,17 @@ class TestSampleData(unittest.TestCase):
     def test_get_club_not_found(self):
         self.assertIsNone(sample_data.get_club(999))
 
+    def test_get_club_data_unavailable(self):
+        original_data_dir = sample_data.DATA_DIR
+
+        try:
+            sample_data.DATA_DIR = Path("/nonexistent_directory")
+
+            with self.assertRaises(sample_data.DataUnavailableError):
+                sample_data.get_club(6)
+        finally:
+            sample_data.DATA_DIR = original_data_dir
+
     def test_get_event_found(self):
         event = sample_data.get_event(3)
 
@@ -90,6 +101,17 @@ class TestSampleData(unittest.TestCase):
 
     def test_get_event_not_found(self):
         self.assertIsNone(sample_data.get_event(999))
+
+    def test_get_event_data_unavailable(self):
+        original_data_dir = sample_data.DATA_DIR
+
+        try:
+            sample_data.DATA_DIR = Path("/nonexistent_directory")
+
+            with self.assertRaises(sample_data.DataUnavailableError):
+                sample_data.get_event(3)
+        finally:
+            sample_data.DATA_DIR = original_data_dir
 
 
 if __name__ == "__main__":

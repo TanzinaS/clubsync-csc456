@@ -1,4 +1,6 @@
+
 import json
+from datetime import datetime
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
@@ -35,9 +37,27 @@ def load_sample_events():
 
 def get_club(club_id):
     clubs = load_sample_clubs()
-    return next((club for club in clubs if club["id"] == club_id), None)
+    return next(
+        (club for club in clubs if club["id"] == club_id),
+        None
+    )
 
 
 def get_event(event_id):
     events = load_sample_events()
-    return next((event for event in events if event["id"] == event_id), None)
+    return next(
+        (event for event in events if event["id"] == event_id),
+        None
+    )
+
+
+def sorted_events(events):
+    return sorted(
+        events,
+        key=lambda event: (
+            datetime.fromisoformat(
+                event["start_time"].replace("Z", "+00:00")
+            ),
+            event["id"]
+        )
+    )

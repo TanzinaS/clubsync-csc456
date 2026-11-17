@@ -47,7 +47,18 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         clubs = response.get_json()
+
+        # Verify that all 14 clubs are returned.
         self.assertEqual(len(clubs), 14)
+
+        # Verify that every club has an ID and name.
+        for club in clubs:
+            self.assertIn("id", club)
+            self.assertIn("name", club)
+
+        # Verify that all club IDs are unique.
+        club_ids = [club["id"] for club in clubs]
+        self.assertEqual(len(club_ids), len(set(club_ids)))
 
         # Check that clubs are sorted by ID.
         ids = [club["id"] for club in clubs]
@@ -119,7 +130,7 @@ class TestBackendServer(unittest.TestCase):
         event_ids = [
             event["id"] for event in response.get_json()
         ]
-
+        
         self.assertLess(
             event_ids.index(12),
             event_ids.index(11)

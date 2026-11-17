@@ -109,7 +109,7 @@ With the virtual environment activated, run this from the repository root:
 python backend/app.py
 ```
 
-The development server starts at **http://127.0.0.1:5001** with debug mode and automatic reload enabled. Stop it with **Ctrl+C**. When returning to the project in a new terminal, activate the virtual environment again before starting the server.
+The development server starts at **http://127.0.0.1:5001** with debug mode disabled by default. To enable debug mode and automatic reload during local development, set FLASK_DEBUG=true before starting the server. Stop it with **Ctrl+C**. When returning to the project in a new terminal, activate the virtual environment again before starting the server.
 
 Available endpoints:
 
@@ -176,3 +176,13 @@ Full details: [CONTRIBUTING.md](CONTRIBUTING.md)
 ## Security
 
 Never commit API keys, passwords, tokens, or other credentials. Keep secrets in a local `.env` file, which is ignored by Git.
+
+### Flask Debug Mode
+
+Flask debug mode is disabled by default for safety.
+
+To enable debug mode during local development, set:
+
+FLASK_DEBUG=true
+
+Debug mode should remain disabled in production.

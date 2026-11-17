@@ -10,6 +10,7 @@ sys.path.insert(
 )
 
 from app import create_app
+from services.sample_data import load_sample_clubs
 
 
 class TestBackendServer(unittest.TestCase):
@@ -43,10 +44,29 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         clubs = response.get_json()
-        self.assertEqual(len(clubs), 3)
-        self.assertEqual(clubs[0]["name"], "Computer Science Club")
-        self.assertEqual(clubs[1]["name"], "Robotics Club")
-        self.assertEqual(clubs[2]["name"], "Photography Club")
+        self.assertEqual(len(clubs), 14)
+
+        # Check that clubs are sorted by ID.
+        ids = [club["id"] for club in clubs]
+        self.assertEqual(ids, sorted(ids))
+        self.assertEqual(len(ids), len(set(ids)))
+
+        # Check that all required fields are included.
+        required_fields = {
+            "id", "name", "category",
+            "description", "contact_email"
+        }
+
+        for club in clubs:
+            self.assertTrue(required_fields.issubset(club.keys()))
+
+        # Verify actual club data matches the shared JSON.
+        expected = sorted(
+            load_sample_clubs(),
+            key=lambda club: club["id"]
+        )
+        self.assertEqual(clubs, expected)
+        self.assertEqual(clubs[0]["name"], "Math Wizards")
 
     # Pretend today is before all sample events.
     @patch("api.events.date")

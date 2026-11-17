@@ -19,3 +19,6 @@ def unfollow_club(club_id):
         DEMO_USER["followed_clubs"].remove(club_id)
     return DEMO_USER
 
+def reset_demo_user():
+    DEMO_USER["followed_clubs"].clear()
+

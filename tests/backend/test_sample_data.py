@@ -61,6 +61,59 @@ class TestSampleData(unittest.TestCase):
 
         self.assertEqual(events, original_data)
 
+    def test_get_club_found(self):
+        club = sample_data.get_club(6)
+
+        with (sample_data.DATA_DIR / "sample_clubs.json").open(
+            "r", encoding="utf-8"
+        ) as file:
+            original_data = json.load(file)
+
+        expected = next(club for club in original_data if club["id"] == 6)
+
+        self.assertEqual(club, expected)
+
+    def test_get_club_not_found(self):
+        self.assertIsNone(sample_data.get_club(999))
+
+    def test_get_club_data_unavailable(self):
+        original_data_dir = sample_data.DATA_DIR
+
+        try:
+            sample_data.DATA_DIR = Path("/nonexistent_directory")
+
+            with self.assertRaises(sample_data.DataUnavailableError):
+                sample_data.get_club(6)
+        finally:
+            sample_data.DATA_DIR = original_data_dir
+
+    def test_get_event_found(self):
+        event = sample_data.get_event(3)
+
+        with (sample_data.DATA_DIR / "sample_events.json").open(
+            "r", encoding="utf-8"
+        ) as file:
+            original_data = json.load(file)
+
+        expected = next(event for event in original_data if event["id"] == 3)
+
+        self.assertEqual(event, expected)
+
+    def test_get_event_not_found(self):
+        self.assertIsNone(sample_data.get_event(999))
+
+    def test_get_event_data_unavailable(self):
+        original_data_dir = sample_data.DATA_DIR
+
+        try:
+            sample_data.DATA_DIR = Path("/nonexistent_directory")
+
+            with self.assertRaises(sample_data.DataUnavailableError):
+                sample_data.get_event(3)
+        finally:
+            sample_data.DATA_DIR = original_data_dir
+
 
 if __name__ == "__main__":
     unittest.main()
+

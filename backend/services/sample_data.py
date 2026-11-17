@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -32,3 +31,13 @@ def load_sample_events():
         raise DataUnavailableError(
             "Unable to load event data"
         ) from error
+
+
+def get_club(club_id):
+    clubs = load_sample_clubs()
+    return next((club for club in clubs if club["id"] == club_id), None)
+
+
+def get_event(event_id):
+    events = load_sample_events()
+    return next((event for event in events if event["id"] == event_id), None)

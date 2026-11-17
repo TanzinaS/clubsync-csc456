@@ -1,6 +1,3 @@
-
-from datetime import date
-
 from flask import Blueprint, jsonify, request
 from services.demo_user import get_demo_user
 from services.sample_data import load_sample_events, sorted_events, get_event
@@ -59,22 +56,21 @@ def get_events():
     events = sorted_events(events)
     return jsonify(events)
 
-
 @events_bp.get("/api/events/personalized")
 def get_personalized_events():
     user = get_demo_user()
     followed_clubs = user["followed_clubs"]
 
-    today = date.today().isoformat()
+    events = load_sample_events()
 
     personalized_events = [
-        event for event in EVENTS
+        event for event in events
         if event["club_id"] in followed_clubs
-        and event["date"] >= today
     ]
+    
+    personalized_events = sorted_events(personalized_events)
 
     return jsonify(personalized_events), 200
-
 
 # Issue #16: Return a specific event by its ID.
 @events_bp.get("/api/events/<int:event_id>")

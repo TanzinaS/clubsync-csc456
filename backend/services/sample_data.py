@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -24,8 +23,14 @@ def load_sample_clubs():
 
 def load_sample_events():
     file_path = DATA_DIR / "sample_events.json"
-    with file_path.open("r", encoding="utf-8") as file:
-        return json.load(file)
+
+    try:
+        with file_path.open("r", encoding="utf-8") as file:
+            return json.load(file)
+    except (OSError, json.JSONDecodeError) as error:
+        raise DataUnavailableError(
+            "Unable to load event data"
+        ) from error
 
 
 def get_club(club_id):
@@ -36,11 +41,3 @@ def get_club(club_id):
 def get_event(event_id):
     events = load_sample_events()
     return next((event for event in events if event["id"] == event_id), None)
-
-    try:
-        with file_path.open("r", encoding="utf-8") as file:
-            return json.load(file)
-    except (OSError, json.JSONDecodeError) as error:
-        raise DataUnavailableError(
-            "Unable to load event data"
-        ) from error

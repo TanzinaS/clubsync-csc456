@@ -3,7 +3,7 @@ from datetime import date
 
 from flask import Blueprint, jsonify, request
 from services.demo_user import get_demo_user
-from services.sample_data import load_sample_events, sorted_events
+from services.sample_data import load_sample_events, sorted_events, get_event
 
 events_bp = Blueprint("events", __name__)
 
@@ -79,10 +79,9 @@ def get_personalized_events():
 # Issue #16: Return a specific event by its ID.
 @events_bp.get("/api/events/<int:event_id>")
 def get_event_details(event_id):
-    events = load_sample_events()
+    event = get_event(event_id)
 
-    for event in events:
-        if event["id"] == event_id:
-            return jsonify(event), 200
+    if event is not None:
+        return jsonify(event), 200
 
     return jsonify({"error": "Event not found"}), 404

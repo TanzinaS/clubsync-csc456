@@ -331,5 +331,58 @@ class TestBackendServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), [])
 
+    # Issue #88: No followed clubs should return an empty list.
+    def test_personalized_events_empty_state(self):
+        response = self.client.get("/api/events/personalized")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), [])
+
+    # Issue #88: Events from multiple followed clubs are included.
+    def test_personalized_events_multiple_clubs(self):
+        self.client.post("/api/clubs/1/follow")
+        self.client.post("/api/clubs/6/follow")
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        club_ids = {event["club_id"] for event in events}
+
+        self.assertIn(1, club_ids)
+        self.assertIn(6, club_ids)
+        self.assertTrue(club_ids.issubset({1, 6}))
+
+    # Issue #88: Following the same club twice should not duplicate events.
+    def test_personalized_events_duplicate_follows(self):
+        self.client.post("/api/clubs/6/follow")
+        self.client.post("/api/clubs/6/follow")
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        expected_events = [
+            event for event in load_sample_events()
+            if event["club_id"] == 6
+        ]
+
+        self.assertEqual(len(events), len(expected_events))
+        self.assertEqual(events, expected_events)
+
+    # Issue #88: Personalized events should include past events.
+    def test_personalized_events_includes_past_events(self):
+        self.client.post("/api/clubs/6/follow")
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        expected_events = [
+            event for event in load_sample_events()
+            if event["club_id"] == 6
+        ]
+
+        self.assertEqual(events, expected_events)
 if __name__ == "__main__":
     unittest.main()

@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+# Public, non-secret build config for the frontend (the deployed API origin).
+!frontend/.env.production
 *.pem
 *.key
 credentials*.json

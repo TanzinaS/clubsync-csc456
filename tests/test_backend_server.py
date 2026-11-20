@@ -9,6 +9,7 @@ sys.path.insert(
 )
 
 from app import create_app
+from services.demo_user import reset_demo_user
 from services.sample_data import (
     load_sample_clubs,
     load_sample_events,
@@ -19,6 +20,7 @@ from services.sample_data import (
 class TestBackendServer(unittest.TestCase):
 
     def setUp(self):
+        reset_demo_user()
         self.app = create_app()
         self.app.config["TESTING"] = True
         self.client = self.app.test_client()
@@ -296,7 +298,101 @@ class TestBackendServer(unittest.TestCase):
             response.get_json(),
             {"error": "Invalid club_id"}
         )
+        # Issue #88: Following club 6 shows only its events.
+    def test_personalized_events_by_followed_club(self):
+        follow_response = self.client.post("/api/clubs/6/follow")
+        self.assertEqual(follow_response.status_code, 200)
 
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
 
+        events = response.get_json()
+
+        expected_events = [
+            event for event in load_sample_events()
+            if event["club_id"] == 6
+        ]
+
+        self.assertTrue(expected_events)
+        self.assertEqual(events, expected_events)
+
+        # Issue #88: Unfollowing club 10 leaves only club 6's event.
+    def test_personalized_events_after_unfollow(self):
+        self.client.post("/api/clubs/6/follow")
+        self.client.post("/api/clubs/10/follow")
+
+        unfollow_response = self.client.post("/api/clubs/10/unfollow")
+        self.assertEqual(unfollow_response.status_code, 200)
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        event_ids = [event["id"] for event in response.get_json()]
+        self.assertEqual(event_ids, [3])
+
+    # Issue #88: No followed clubs should return an empty list.
+    def test_personalized_events_empty_state(self):
+        response = self.client.get("/api/events/personalized")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), [])
+
+        # Issue #88: Events from multiple clubs are sorted chronologically.
+    def test_personalized_events_multiple_clubs(self):
+        self.client.post("/api/clubs/5/follow")
+        self.client.post("/api/clubs/10/follow")
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        event_ids = [event["id"] for event in events]
+
+        self.assertEqual(event_ids, [12, 11])
+
+    # Issue #88: Following the same club twice should not duplicate events.
+    def test_personalized_events_duplicate_follows(self):
+        self.client.post("/api/clubs/6/follow")
+        self.client.post("/api/clubs/6/follow")
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+        expected_events = [
+            event for event in load_sample_events()
+            if event["club_id"] == 6
+        ]
+
+        self.assertEqual(len(events), len(expected_events))
+        self.assertEqual(events, expected_events)
+
+        # Issue #88: Personalized events include past and future events.
+    @patch("api.events.load_sample_events")
+    def test_personalized_events_includes_past_events(self, mock_load):
+        past_event = {
+            "id": 100,
+            "club_id": 6,
+            "title": "Past Event",
+            "start_time": "2020-01-01T10:00:00Z",
+        }
+
+        future_event = {
+            "id": 101,
+            "club_id": 6,
+            "title": "Future Event",
+            "start_time": "2099-01-01T10:00:00Z",
+        }
+
+        mock_load.return_value = [future_event, past_event]
+
+        self.client.post("/api/clubs/6/follow")
+
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+
+        event_ids = [event["id"] for event in response.get_json()]
+        self.assertEqual(event_ids, [100, 101])
+        
 if __name__ == "__main__":
     unittest.main()

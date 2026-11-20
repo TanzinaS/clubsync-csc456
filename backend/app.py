@@ -4,6 +4,7 @@ import logging
 import sys
 import time
 
+import sentry_sdk
 from flask import Flask, jsonify, g, request
 from flask_cors import CORS
 
@@ -11,6 +12,29 @@ from api.clubs import clubs_bp
 from api.events import events_bp
 from api.users import users_bp
 from services.sample_data import DataUnavailableError
+
+
+def init_sentry():
+    """Start Sentry only when SENTRY_DSN is set, so local dev and tests run without it."""
+    dsn = os.getenv("SENTRY_DSN", "").strip()
+    if not dsn:
+        return False
+
+    # Render sets RENDER and RENDER_GIT_COMMIT on its services.
+    environment = os.getenv("SENTRY_ENVIRONMENT") or (
+        "production" if os.getenv("RENDER") else "development"
+    )
+    sentry_sdk.init(
+        dsn=dsn,
+        environment=environment,
+        release=os.getenv("RENDER_GIT_COMMIT") or None,
+        # Every trace in development, 10% in production.
+        traces_sample_rate=0.1 if environment == "production" else 1.0,
+    )
+    return True
+
+
+init_sentry()
 
 
 def create_app():

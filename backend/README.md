@@ -27,8 +27,9 @@ The `backend/.env.example` file documents the environment variables used by the 
 
 - `FLASK_DEBUG=false` — Disables Flask debug mode by default. Set to `true` only for local development.
 - `FRONTEND_ORIGIN=http://localhost:5173` — Specifies which frontend origin is allowed to access the API.
+- `SENTRY_DSN` (optional): the DSN of the `clubsync-server` Sentry project. Unset turns Sentry off, so local dev works without it.
 
-For production, set `FRONTEND_ORIGIN` to the actual deployed frontend URL in Render's environment settings.
+For production, set `FRONTEND_ORIGIN` to the actual deployed frontend URL in Render's environment settings. Set `SENTRY_DSN` there too, so production errors reach Sentry.
 
 ## Setup
 

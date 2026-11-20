@@ -1,0 +1,11 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "./frontend/dist",
+      "numberOfRuns": 3,
+      "settings": {
+        "onlyCategories": ["performance", "accessibility", "best-practices", "seo"]
+      }
+    }
+  }
+}

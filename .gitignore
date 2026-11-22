@@ -42,3 +42,8 @@ coverage/
 *.log
 *.sqlite3
 *.db
+
+# ---- Playwright test output ----
+playwright-report/
+test-results/
+.coverage

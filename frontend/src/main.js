@@ -1,11 +1,11 @@
 import './styles/main.css';
-import { events } from './services/data.js';
+import { directory, loadDirectory } from './services/data.js';
 import { calendarFile } from './services/directory.js';
 import { logo, eventDetail } from './components/ui.js';
 import { homePage } from './pages/home.js';
 import { eventsPage, eventFilters, updateEventResults } from './pages/events.js';
 import { clubsPage, updateClubResults } from './pages/clubs.js';
-import { calendarPage, changeWeek } from './pages/calendar.js';
+import { calendarPage, changeWeek, initCalendar } from './pages/calendar.js';
 import { authPage } from './pages/auth.js';
 
 const main = document.querySelector('#main');
@@ -54,13 +54,13 @@ document.addEventListener('click', event => {
   const target = event.target.closest('button');
   if (!target) return;
   if (target.dataset.event) {
-    const item = events.find(e => e.id === Number(target.dataset.event));
+    const item = directory.events.find(e => e.id === Number(target.dataset.event));
     dialog.innerHTML = eventDetail(item);
     dialog.showModal();
   }
   if (target.hasAttribute('data-close')) dialog.close();
   if (target.dataset.download) {
-    const item = events.find(e => e.id === Number(target.dataset.download));
+    const item = directory.events.find(e => e.id === Number(target.dataset.download));
     const url = URL.createObjectURL(new Blob([calendarFile(item)], { type: 'text/calendar;charset=utf-8' }));
     const link = document.createElement('a');
     link.href = url; link.download = `campus-event-${item.id}.ics`; link.click();
@@ -100,7 +100,19 @@ document.addEventListener('submit', event => {
   if (event.target.id === 'auth-form') { event.preventDefault(); authNotice(); event.target.reset(); }
 });
 dialog.addEventListener('click', event => { if (event.target === dialog && (event.clientX < dialog.getBoundingClientRect().left || event.clientX > dialog.getBoundingClientRect().right || event.clientY < dialog.getBoundingClientRect().top || event.clientY > dialog.getBoundingClientRect().bottom)) dialog.close(); });
-window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); main.focus({ preventScroll: true }); });
 // Keep the live indicator current after choosing Today, without closing an open event.
 setInterval(() => { if (currentRoute === '/calendar' && !dialog.open && !document.activeElement?.matches('button, a, input, select')) main.innerHTML = calendarPage(); }, 60_000);
-render();
+
+async function start() {
+  try {
+    await loadDirectory();
+  } catch (error) {
+    // The loading and error UI is a separate change. Until then, pages render with an empty directory.
+    console.error('Could not load clubs and events from the API.', error);
+  }
+  initCalendar();
+  window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); main.focus({ preventScroll: true }); });
+  render();
+}
+
+start();

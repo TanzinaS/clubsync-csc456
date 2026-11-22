@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { eventsPage, eventResults, isUpcoming, updateEventResults } from '../src/pages/events.js';
-import { calendarPage } from '../src/pages/calendar.js';
+import { calendarPage, initCalendar } from '../src/pages/calendar.js';
+import { directory, loadDirectory } from '../src/services/data.js';
 import { CATEGORIES, prepareDirectory, weekEvents } from '../src/services/directory.js';
 
 function categoryButtons(params = new URLSearchParams()) {
@@ -85,9 +87,19 @@ describe('upcoming events feed', () => {
     expect(weekEvents(mockEvents, '2026-11-16').map(event => event.id)).toEqual([10, 11, 12]);
   });
 
-  describe('with the page data and a fixed clock', () => {
+  describe('with the page data from the mocked API and a fixed clock', () => {
+    // The sample files match the V1 API_CONTRACT shapes for GET /api/clubs and GET /api/events.
+    const readData = name => JSON.parse(readFileSync(new URL(`../../data/${name}.json`, import.meta.url), 'utf8'));
+    const apiData = { '/api/clubs': readData('sample_clubs'), '/api/events': readData('sample_events') };
     let elements;
-    beforeEach(() => {
+    beforeEach(async () => {
+      vi.stubEnv('VITE_API_BASE_URL', 'https://clubsync-api.example');
+      vi.stubGlobal('fetch', vi.fn(async url => new Response(JSON.stringify(apiData[new URL(url).pathname]), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })));
+      // Wait for the shared directory to load before any page reads it.
+      await loadDirectory();
+      initCalendar();
       vi.useFakeTimers();
       elements = { '#events-count': {}, '#events-results': {} };
       vi.stubGlobal('document', { querySelector: selector => elements[selector], querySelectorAll: () => [] });
@@ -95,6 +107,14 @@ describe('upcoming events feed', () => {
     afterEach(() => {
       vi.useRealTimers();
       vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
+    });
+
+    it('reads the pages from the API, not bundled data', () => {
+      expect(fetch).toHaveBeenCalledWith('https://clubsync-api.example/api/clubs', expect.anything());
+      expect(fetch).toHaveBeenCalledWith('https://clubsync-api.example/api/events', expect.anything());
+      expect(directory.clubs).toHaveLength(14);
+      expect(directory.events).toHaveLength(12);
     });
 
     it('updates the feed from the current time while the calendar keeps past events', () => {

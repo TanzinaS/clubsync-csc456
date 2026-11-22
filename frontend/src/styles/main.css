@@ -124,6 +124,15 @@ a.club-byline:hover { color: var(--violet); }
 .load-spinner { display: inline-block; width: 32px; height: 32px; margin-bottom: 14px; border: 3px solid var(--soft); border-top-color: var(--violet); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .load-spinner { animation: none; } }
+.follow-control { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.club-card .follow-control { margin-bottom: 18px; }
+.follow-button { min-height: 36px; padding: 7px 16px; border-radius: 8px; border: 1px solid var(--violet); background: white; color: var(--violet); font-size: 14px; font-weight: 600; cursor: pointer; }
+.follow-button:hover { background: var(--soft); }
+.follow-button.following { background: var(--violet); color: white; }
+.follow-button.following:hover { background: #6424d5; }
+.follow-button[aria-disabled="true"] { opacity: .6; cursor: progress; }
+.follow-error { color: #b3261e; font-size: 13px; }
+.detail-club { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 .clubs-page { max-width: 1168px; }
 .clubs-intro { text-align: center; padding: 15px 0 36px; }
 .clubs-intro h1 { margin: 12px 0; font-size: 38px; }

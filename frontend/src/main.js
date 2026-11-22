@@ -1,7 +1,8 @@
 import './styles/main.css';
 import { directory, loadDirectory } from './services/data.js';
 import { calendarFile } from './services/directory.js';
-import { logo, eventDetail, loadingState, loadError, LOADING_MESSAGE, SLOW_LOADING_MESSAGE } from './components/ui.js';
+import { logo, eventDetail, loadingState, loadError, syncFollowButtons, LOADING_MESSAGE, SLOW_LOADING_MESSAGE } from './components/ui.js';
+import { loadFollows, onFollowChange, toggleFollow } from './services/follows.js';
 import { withRetry } from './services/retry.js';
 import { homePage } from './pages/home.js';
 import { eventsPage, eventFilters, updateEventResults } from './pages/events.js';
@@ -49,6 +50,21 @@ function syncFilters() {
   updateEventResults(filters);
 }
 
+// A failed follow keeps the previous state and shows the error next to the clicked button.
+async function handleFollow(button) {
+  const error = button.closest('.follow-control').querySelector('.follow-error');
+  error.textContent = '';
+  try {
+    await toggleFollow(Number(button.dataset.follow));
+  } catch (failure) {
+    console.error('Could not update the follow.', failure);
+    error.textContent = 'Couldn’t update. Try again.';
+  }
+}
+
+// Keeps every follow button on screen (club cards and event details) in sync with the shared state.
+onFollowChange(() => syncFollowButtons());
+
 function authNotice(google = false) {
   const message = document.querySelector('#auth-message');
   message.hidden = false;
@@ -68,6 +84,7 @@ document.addEventListener('click', event => {
     dialog.showModal();
   }
   if (target.hasAttribute('data-close')) dialog.close();
+  if (target.dataset.follow) handleFollow(target);
   if (target.dataset.download) {
     const item = directory.events.find(e => e.id === Number(target.dataset.download));
     const url = URL.createObjectURL(new Blob([calendarFile(item)], { type: 'text/calendar;charset=utf-8' }));
@@ -125,7 +142,8 @@ async function loadAndRender() {
   };
   const slowTimer = setTimeout(() => { slow = true; showStatus(); }, SLOW_LOAD_MS);
   try {
-    await withRetry(loadDirectory, { onRetry: ({ retry, of }) => { retries = ` Retrying (${retry} of ${of}).`; showStatus(); } });
+    // Follows come from GET /api/me, so they survive a page refresh.
+    await withRetry(() => Promise.all([loadDirectory(), loadFollows()]), { onRetry: ({ retry, of }) => { retries = ` Retrying (${retry} of ${of}).`; showStatus(); } });
   } catch (error) {
     console.error('Could not load clubs and events from the API.', error);
     main.innerHTML = loadError();

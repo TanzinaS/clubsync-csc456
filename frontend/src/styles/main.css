@@ -119,6 +119,11 @@ a.club-byline:hover { color: var(--violet); }
 .empty-state > svg { width: 32px; height: 32px; color: var(--violet); margin-bottom: 16px; }
 .empty-state h2 { font-size: 24px; }
 .empty-state p { color: var(--muted); margin: 10px 0 23px; line-height: 1.6; }
+.load-state { max-width: 560px; text-align: center; }
+.load-state:not(.empty-state) { padding-top: 120px; color: var(--muted); line-height: 1.6; }
+.load-spinner { display: inline-block; width: 32px; height: 32px; margin-bottom: 14px; border: 3px solid var(--soft); border-top-color: var(--violet); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .load-spinner { animation: none; } }
 .clubs-page { max-width: 1168px; }
 .clubs-intro { text-align: center; padding: 15px 0 36px; }
 .clubs-intro h1 { margin: 12px 0; font-size: 38px; }

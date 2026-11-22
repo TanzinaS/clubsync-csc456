@@ -1,7 +1,8 @@
 import './styles/main.css';
 import { directory, loadDirectory } from './services/data.js';
 import { calendarFile } from './services/directory.js';
-import { logo, eventDetail } from './components/ui.js';
+import { logo, eventDetail, loadingState, loadError, LOADING_MESSAGE, SLOW_LOADING_MESSAGE } from './components/ui.js';
+import { withRetry } from './services/retry.js';
 import { homePage } from './pages/home.js';
 import { eventsPage, eventFilters, updateEventResults } from './pages/events.js';
 import { clubsPage, updateClubResults } from './pages/clubs.js';
@@ -12,13 +13,21 @@ const main = document.querySelector('#main');
 const dialog = document.querySelector('#event-dialog');
 let filters = {};
 let currentRoute = '';
+let loaded = false;
+const SLOW_LOAD_MS = 5000;
 
-function render() {
-  const [path, query = ''] = (location.hash.slice(1) || '/').split('?');
-  const params = new URLSearchParams(query);
-  currentRoute = path;
+const route = () => (location.hash.slice(1) || '/').split('?');
+
+function renderHeader(path) {
   document.querySelector('#header').innerHTML = `<div class="nav-inner"><a class="brand" href="#/" aria-label="Campus Groups · CCNY home">${logo()}<span>Campus Groups</span><span class="brand-campus">· CCNY</span></a>
     <nav aria-label="Main navigation">${['Events', 'Clubs', 'Calendar'].map(label => `<a href="#/${label.toLowerCase()}" ${path === '/' + label.toLowerCase() ? 'class="active" aria-current="page"' : ''}>${label}</a>`).join('')}<span class="nav-divider"></span><a class="nav-signin" href="#/signin" ${['/signin', '/signup'].includes(path) ? 'aria-current="page"' : ''}>Sign in</a></nav></div>`;
+}
+
+function render() {
+  const [path, query = ''] = route();
+  const params = new URLSearchParams(query);
+  currentRoute = path;
+  renderHeader(path);
   if (dialog.open) dialog.close();
   main.className = path === '/' ? 'home-main' : '';
   if (path === '/') main.innerHTML = homePage();
@@ -86,6 +95,7 @@ document.addEventListener('click', event => {
     main.querySelector(`[data-week="${target.dataset.week}"]`)?.focus({ preventScroll: true });
   }
   if (target.hasAttribute('data-google')) authNotice(true);
+  if (target.hasAttribute('data-retry-load')) loadAndRender();
 });
 
 document.addEventListener('input', event => {
@@ -103,16 +113,40 @@ dialog.addEventListener('click', event => { if (event.target === dialog && (even
 // Keep the live indicator current after choosing Today, without closing an open event.
 setInterval(() => { if (currentRoute === '/calendar' && !dialog.open && !document.activeElement?.matches('button, a, input, select')) main.innerHTML = calendarPage(); }, 60_000);
 
-async function start() {
+// Shows the loading state, retries failed loads with backoff, and falls back to an error
+// with a Try again button. Used on startup and by that button, without a page reload.
+async function loadAndRender() {
+  main.innerHTML = loadingState();
+  let slow = false;
+  let retries = '';
+  const showStatus = () => {
+    const status = main.querySelector('#load-status');
+    if (status) status.textContent = slow || retries ? `${SLOW_LOADING_MESSAGE}${retries}` : LOADING_MESSAGE;
+  };
+  const slowTimer = setTimeout(() => { slow = true; showStatus(); }, SLOW_LOAD_MS);
   try {
-    await loadDirectory();
+    await withRetry(loadDirectory, { onRetry: ({ retry, of }) => { retries = ` Retrying (${retry} of ${of}).`; showStatus(); } });
   } catch (error) {
-    // The loading and error UI is a separate change. Until then, pages render with an empty directory.
     console.error('Could not load clubs and events from the API.', error);
+    main.innerHTML = loadError();
+    main.querySelector('[data-retry-load]').focus();
+    return;
+  } finally {
+    clearTimeout(slowTimer);
   }
-  initCalendar();
-  window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); main.focus({ preventScroll: true }); });
+  if (!loaded) initCalendar();
+  loaded = true;
   render();
+}
+
+function start() {
+  renderHeader(route()[0]);
+  // Until the directory loads, only the nav follows the URL. render() picks up the route afterwards.
+  window.addEventListener('hashchange', () => {
+    if (!loaded) { renderHeader(route()[0]); return; }
+    render(); window.scrollTo(0, 0); main.focus({ preventScroll: true });
+  });
+  loadAndRender();
 }
 
 start();

@@ -4,23 +4,29 @@ A living list of what ClubSync does and what it will do. Update this file whenev
 
 Individual tasks and bugs are tracked on the GitHub Projects board, not here. This file tracks **features**, one level above tasks.
 
-**Status key:** Proposed · Planned · In Progress · Done · On Hold · Dropped
+**V1 API contract:** [docs/API_CONTRACT.md](docs/API_CONTRACT.md)
 
-**Last updated:** 2026-10-13
+**GitHub project board:** [ClubSync Project Board](https://github.com/users/TanzinaS/projects/1/views/7)
+
+**Status key:** Implemented · In Progress · Post-V1
+
+**Last updated:** 2026-11-22
 
 ## Feature List
 
 | Feature | Description | Status | Area | Notes |
 |---|---|---|---|---|
-| Landing page and navigation | Entry point and site-wide navigation | In Progress | Frontend | Sprint 1 |
-| Events feed | List of upcoming club events | In Progress | Frontend | Sprint 1 |
-| Calendar view | Personalized calendar of chosen events | In Progress | Frontend | Sprint 1 |
-| Club discovery and selection | Browse clubs and choose favorites | Planned | Frontend + Backend | |
-| Club pages | Info and events for a single club | Planned | Frontend + Backend | |
-| Events API | Backend endpoints that serve club and event data | Planned | Backend | |
-| User authentication | Accounts and login | Planned | Backend | |
-| Google Calendar integration | Export or sync events to Google Calendar | Planned | Backend | |
-| RSVP | Students mark that they plan to attend | Proposed | TBD | Not confirmed |
+| Landing page and navigation | Home page and navigation between ClubSync views | Implemented | Frontend | V1; landing page and navigation are available |
+| Events feed | Browse club events with search, category, and club filters | Implemented | Frontend + Backend | V1; uses the Flask Events API |
+| Calendar view | Weekly calendar showing club events, with personalized event viewing | In Progress | Frontend + Backend | V1; calendar UI exists, but personalized integration still needs verification |
+| Club discovery and selection | Browse clubs and follow or unfollow favorites | In Progress | Frontend + Backend | V1; verify follow controls and personalized views before marking Implemented |
+| Club pages | Dedicated page with information and events for one club | Post-V1 | Frontend + Backend | Single-club pages are outside V1 scope |
+| Events API | Backend endpoints that serve club and event data | Implemented | Backend | |
+| Calendar export (.ics) | Download events as calendar files | Implemented | Frontend | V1 frontend export |
+| Shared demo user | One demo user can follow and unfollow clubs and view personalized events | Implemented | Backend | V1; follows are stored in memory and reset when the backend restarts |
+| User authentication | Real accounts, sign-up, and login | Post-V1 | Frontend + Backend | V1 uses one shared demo user; real authentication is not implemented |
+| Google Calendar integration | Direct integration or synchronization with Google Calendar | Post-V1 | Frontend + Backend | Not implemented; V1 supports frontend .ics downloads instead |
+| RSVP | Students mark that they plan to attend club events | Post-V1 | TBD | Not implemented; scope still requires PM approval |
 
 ## Open Questions
 
@@ -33,3 +39,4 @@ Individual tasks and bugs are tracked on the GitHub Projects board, not here. Th
 | Date | Change |
 |---|---|
 | 2026-10-13 | Initial feature list created |
+| 2026-11-22 | Updated V1 feature statuses, separated Post-V1 features, and added project board and API contract links |

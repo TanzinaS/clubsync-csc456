@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -27,6 +26,9 @@ describe('Personalized events service', () => {
       id: 4,
       club_id: 6,
       title: 'Second Event',
+      description: 'A technology workshop for students.',
+      location: 'CCNY Campus',
+      contact_email: 'robotics@example.com',
       start_time: '2026-11-20T14:00:00-05:00',
       end_time: '2026-11-20T16:00:00-05:00',
       tags: ['Tech'],
@@ -35,9 +37,12 @@ describe('Personalized events service', () => {
       id: 3,
       club_id: 6,
       title: 'First Event',
+      description: 'A robotics workshop for students.',
+      location: 'CCNY Campus',
+      contact_email: 'robotics@example.com',
       start_time: '2026-11-18T14:00:00-05:00',
       end_time: '2026-11-18T16:00:00-05:00',
-      tags: [],
+      tags: ['Tech'],
     },
   ];
 
@@ -76,5 +81,36 @@ describe('Personalized events service', () => {
     await expect(loadPersonalizedEvents()).rejects.toThrow(
       'Network request failed'
     );
+  });
+  it('rejects events with invalid times', async () => {
+    const invalidEvent = {
+      ...events[0],
+      start_time: '2026-11-20T16:00:00-05:00',
+      end_time: '2026-11-20T14:00:00-05:00',
+    };
+
+    getPersonalizedEvents.mockResolvedValue([invalidEvent]);
+    getClubs.mockResolvedValue(clubs);
+
+    await expect(loadPersonalizedEvents()).rejects.toThrow();
+  });
+  it('propagates errors when loading clubs fails', async () => {
+    getPersonalizedEvents.mockResolvedValue(events);
+    getClubs.mockRejectedValue(new Error('Failed to load clubs'));
+
+    await expect(loadPersonalizedEvents()).rejects.toThrow(
+      'Failed to load clubs'
+    );
+  });
+  it('rejects an event referencing a missing club', async () => {
+    const missingClubEvent = {
+      ...events[0],
+      club_id: 999,
+    };
+
+    getPersonalizedEvents.mockResolvedValue([missingClubEvent]);
+    getClubs.mockResolvedValue(clubs);
+
+    await expect(loadPersonalizedEvents()).rejects.toThrow();
   });
 });

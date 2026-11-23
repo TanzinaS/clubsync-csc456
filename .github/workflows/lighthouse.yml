@@ -1,0 +1,62 @@
+name: Lighthouse
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      # Lighthouse audits the production build, not the dev server.
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      # staticDistDir in the config serves frontend/dist locally for the audit.
+      # There are no assertions, so scores are reported and never fail the job.
+      - name: Run Lighthouse
+        id: lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./.github/lighthouse/lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Write scores to the job summary
+        if: always() && steps.lighthouse.outputs.resultsPath != ''
+        env:
+          RESULTS_PATH: ${{ steps.lighthouse.outputs.resultsPath }}
+          LINKS: ${{ steps.lighthouse.outputs.links }}
+        run: |
+          node <<'JS' >> "$GITHUB_STEP_SUMMARY"
+          const fs = require('fs');
+          const runs = JSON.parse(fs.readFileSync(`${process.env.RESULTS_PATH}/manifest.json`, 'utf8'));
+          const links = JSON.parse(process.env.LINKS || '{}');
+          const pct = value => (value == null ? 'n/a' : Math.round(value * 100));
+          console.log('## Lighthouse scores (median of 3 runs)\n');
+          console.log('| URL | Performance | Accessibility | Best practices | SEO | Report |');
+          console.log('| --- | --- | --- | --- | --- | --- |');
+          for (const run of runs.filter(r => r.isRepresentativeRun)) {
+            const s = run.summary;
+            const report = links[run.url] ? `[view](${links[run.url]})` : 'n/a';
+            console.log(`| ${new URL(run.url).pathname} | ${pct(s.performance)} | ${pct(s.accessibility)} | ${pct(s['best-practices'])} | ${pct(s.seo)} | ${report} |`);
+          }
+          JS

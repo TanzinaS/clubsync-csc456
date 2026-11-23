@@ -2,6 +2,9 @@
 import { test, expect } from '@playwright/test';
 
 test('home page loads and displays events from Flask', async ({ page, request }) => {
+  // Keep the test date fixed so sample events remain upcoming.
+  await page.clock.setFixedTime(new Date('2026-11-16T09:00:00-05:00'));
+
   // Get real events directly from the Flask backend.
   const response = await request.get('http://127.0.0.1:5001/api/events');
   expect(response.ok()).toBeTruthy();
@@ -25,7 +28,11 @@ test('home page loads and displays events from Flask', async ({ page, request })
   ).toBeVisible();
 
   // Verify the page displays at least one event from Flask.
-  const eventTitles = events.map(event => event.title);
+  const fixedNow = new Date('2026-11-16T09:00:00-05:00');
+
+  const eventTitles = events
+    .filter(event => new Date(event.end_time) > fixedNow)
+    .map(event => event.title);
   const results = page.locator('#events-results');
 
   await expect.poll(async () => {

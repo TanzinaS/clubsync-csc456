@@ -8,7 +8,8 @@ The frontend is branded **Campus Groups · CCNY**, with an events timeline, a cl
 
 > This README describes the project and how the repository is organized. It is only updated for major changes.
 > - **Feature status:** [FEATURES.md](FEATURES.md)
-> - **Tasks, bugs, and sprints:** GitHub Projects board *(link to be added)*
+> - **V1 API contract:** [docs/API_CONTRACT.md](docs/API_CONTRACT.md)
+> - **Tasks, bugs, and sprints:** [ClubSync Project Board](https://github.com/users/TanzinaS/projects/1/views/7)
 > - **How to contribute:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
@@ -46,40 +47,17 @@ The backend team collaborates on API/server logic, database management, authenti
 | Frontend | HTML, CSS, and JavaScript modules, built with Vite |
 | Backend framework | Python / Flask, with Flask-Cors |
 | Database | Not connected; API currently uses in-memory sample data |
-| Deployment platform | Not decided |
+| Deployment platform | Vercel (frontend) and Render (Flask backend) |
+
+**Live V1 demo:** [ClubSync on Vercel](https://clubsync-csc456.vercel.app)
+
+**Backend API:** [ClubSync on Render](https://clubsync-csc456.onrender.com)
 
 ## Setup
 
-### Run the web app
+### Run the backend API
 
-Install Node.js 22.12+ (an even-numbered release: 22.12+, 24, or 26+). From the repository root:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open **http://127.0.0.1:5173** (or the local URL printed in your terminal). Stop the server with **Ctrl+C**.
-
-The frontend loads `data/sample_events.json` and `data/sample_clubs.json` directly. No backend, database, API keys, or `.env` file are needed to try it. Search, category/club filters, club discovery, event details, calendar navigation, and `.ics` downloads work locally. Sign-in and sign-up screens are UI previews; authentication is not connected and credentials are not saved or transmitted.
-
-The sample schedule runs from November 16 to December 8, 2026. The calendar initially shows November 16–22 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
-
-From `frontend/`, run the frontend checks (`npm run coverage` adds a coverage report) or build a production bundle:
-
-```bash
-npm test
-npm run coverage
-npm run build
-npm run preview
-```
-
-The production output is in `frontend/dist/`. Preview serves it at **http://127.0.0.1:4173**. See [frontend/README.md](frontend/README.md) for routes and implementation details.
-
-### Run the backend API separately
-
-The Flask API currently has its own in-memory sample data. It is not yet connected to the frontend. No database or credentials are required.
+The Flask API currently has its own in-memory sample data. No database or credentials are required.
 
 #### 1. Create a virtual environment and install dependencies
 
@@ -118,9 +96,7 @@ Available endpoints:
 | http://127.0.0.1:5001/ | Welcome message and server status |
 | http://127.0.0.1:5001/api/health | Health check with `"status": "ok"` |
 | http://127.0.0.1:5001/api/clubs | Sample clubs |
-| http://127.0.0.1:5001/api/events | Sample events dated today or later |
-
-The sample events are dated November 2026, so the events endpoint will return an empty list once all of those dates have passed.
+| http://127.0.0.1:5001/api/events | All sample events, including past and future events |
 
 If port 5001 is already in use, start on another port instead:
 
@@ -139,6 +115,35 @@ python -m unittest discover -s tests -v
 ```
 
 The tests use Flask's test client, so the server does not need to be running.
+
+
+### Run the web app
+
+Install Node.js 22.12+ (an even-numbered release: 22.12+, 24, or 26+). From the repository root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open **http://127.0.0.1:5173** (or the local URL printed in your terminal). Stop the server with **Ctrl+C**.
+
+The frontend fetches club and event data from the Flask backend API. Start the backend on port 5001 before running the frontend. By default, the frontend connects to `http://127.0.0.1:5001`. No database or API keys are required for local development. The `VITE_API_BASE_URL` environment variable can be used to configure a different backend URL; see `frontend/.env.example`. Search, category/club filters, club discovery, event details, calendar navigation, and `.ics` downloads are available. Sign-in and sign-up screens are UI previews; real authentication is not implemented, and credentials are not saved or transmitted.
+
+The sample schedule runs from November 16 to December 8, 2026. The calendar initially shows November 16–22 with a labeled preview clock. **Today** switches to the real current week in New York time; **Back to sample week** restores the demo.
+
+From `frontend/`, run the frontend checks (`npm run coverage` adds a coverage report) or build a production bundle:
+
+```bash
+npm test
+npm run coverage
+npm run build
+npm run preview
+```
+
+The production output is in `frontend/dist/`. Preview serves it at **http://127.0.0.1:4173**. See [frontend/README.md](frontend/README.md) for routes and implementation details.
+The production build uses `frontend/.env.production`, which points to the deployed Render backend. Therefore, `npm run preview` uses the production API configuration rather than the local backend URL.
 
 ## Repository Structure
 

@@ -27,6 +27,7 @@ venv/
 .venv/
 env/
 .pytest_cache/
+.coverage
 
 # ---- JavaScript / Node (if used) ----
 node_modules/
@@ -42,3 +43,7 @@ coverage/
 *.log
 *.sqlite3
 *.db
+
+# ---- Playwright test output ----
+playwright-report/
+test-results/

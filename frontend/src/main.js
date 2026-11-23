@@ -130,6 +130,14 @@ dialog.addEventListener('click', event => { if (event.target === dialog && (even
 // Keep the live indicator current after choosing Today, without closing an open event.
 setInterval(() => { if (currentRoute === '/calendar' && !dialog.open && !document.activeElement?.matches('button, a, input, select')) main.innerHTML = calendarPage(); }, 60_000);
 
+// Follows come from GET /api/me, so they survive a page refresh. They are not needed to
+// browse, so they load next to the directory with their own retries and never block it.
+// Until they arrive, or if they never do, every club shows as not followed, and
+// onFollowChange() updates the buttons as soon as they land.
+function loadFollowsQuietly() {
+  withRetry(loadFollows).catch(error => console.error('Could not load followed clubs. Showing every club as not followed.', error));
+}
+
 // Shows the loading state, retries failed loads with backoff, and falls back to an error
 // with a Try again button. Used on startup and by that button, without a page reload.
 async function loadAndRender() {
@@ -141,9 +149,9 @@ async function loadAndRender() {
     if (status) status.textContent = slow || retries ? `${SLOW_LOADING_MESSAGE}${retries}` : LOADING_MESSAGE;
   };
   const slowTimer = setTimeout(() => { slow = true; showStatus(); }, SLOW_LOAD_MS);
+  loadFollowsQuietly();
   try {
-    // Follows come from GET /api/me, so they survive a page refresh.
-    await withRetry(() => Promise.all([loadDirectory(), loadFollows()]), { onRetry: ({ retry, of }) => { retries = ` Retrying (${retry} of ${of}).`; showStatus(); } });
+    await withRetry(loadDirectory, { onRetry: ({ retry, of }) => { retries = ` Retrying (${retry} of ${of}).`; showStatus(); } });
   } catch (error) {
     console.error('Could not load clubs and events from the API.', error);
     main.innerHTML = loadError();

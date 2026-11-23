@@ -28,9 +28,16 @@ function applyUser(user) {
   user.followed_clubs.forEach(id => followed.add(id));
 }
 
-// Restores follows from GET /api/me, so they survive a page refresh.
+// Counts follow and unfollow responses, so a slow GET /api/me can tell it is out of date.
+let updates = 0;
+
+// Restores follows from GET /api/me, so they survive a page refresh. This can finish after
+// the user has already followed a club; that response is newer, so it wins.
 export async function loadFollows() {
-  applyUser(await getMe());
+  const seen = updates;
+  const user = await getMe();
+  if (updates !== seen) return;
+  applyUser(user);
   notify();
 }
 
@@ -43,6 +50,7 @@ export async function toggleFollow(clubId) {
   notify();
   try {
     applyUser(await request(clubId));
+    updates++;
   } finally {
     pending.delete(clubId);
     notify();

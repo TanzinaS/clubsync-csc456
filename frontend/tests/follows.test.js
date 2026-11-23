@@ -76,6 +76,19 @@ describe('follow state', () => {
     expect(follows.followedClubIds()).toEqual([]);
   });
 
+  it('ignores a GET /api/me that finishes after a follow, since the follow response is newer', async () => {
+    let finish;
+    api.getMe.mockReturnValue(new Promise(resolve => { finish = resolve; }));
+    const loading = follows.loadFollows();
+
+    api.followClub.mockResolvedValue(user([8]));
+    await follows.toggleFollow(8);
+    finish(user([]));
+    await loading;
+
+    expect(follows.isFollowing(8)).toBe(true);
+  });
+
   it('notifies listeners when a request starts and finishes, until they unsubscribe', async () => {
     const listener = vi.fn();
     const unsubscribe = follows.onFollowChange(listener);

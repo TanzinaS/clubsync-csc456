@@ -27,4 +27,4 @@ jobs:
       - name: Run tests with coverage
         run: |
           python -m coverage run --source=backend -m unittest discover -s tests -v
-          python -m coverage report -m
+          python -m coverage report -m --fail-under=95

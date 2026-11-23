@@ -18,7 +18,7 @@ def create_app():
 
     # Issue #85: Allow configured frontend origins.
     # Support both localhost addresses during local development.
-    default_origins = "http://127.0.0.1:5173,http://localhost:5173"
+    default_origins = "http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:4173,http://localhost:4173"
 
     frontend_origins = [
         origin.strip().rstrip("/")

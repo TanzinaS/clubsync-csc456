@@ -27,6 +27,7 @@ venv/
 .venv/
 env/
 .pytest_cache/
+.coverage
 
 # ---- JavaScript / Node (if used) ----
 node_modules/
@@ -46,4 +47,3 @@ coverage/
 # ---- Playwright test output ----
 playwright-report/
 test-results/
-.coverage

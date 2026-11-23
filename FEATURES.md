@@ -18,8 +18,8 @@ Individual tasks and bugs are tracked on the GitHub Projects board, not here. Th
 |---|---|---|---|---|
 | Landing page and navigation | Home page and navigation between ClubSync views | Implemented | Frontend | V1; landing page and navigation are available |
 | Events feed | Browse club events with search, category, and club filters | Implemented | Frontend + Backend | V1; uses the Flask Events API |
-| Calendar view | Weekly calendar showing club events, with personalized event viewing | In Progress | Frontend + Backend | V1; calendar UI exists, but personalized integration still needs verification |
-| Club discovery and selection | Browse clubs and follow or unfollow favorites | In Progress | Frontend + Backend | V1; verify follow controls and personalized views before marking Implemented |
+| Calendar view | Weekly calendar showing club events | In Progress | Frontend + Backend | V1; calendar UI exists, and the personalized-events API is implemented, but the personalized frontend view is not built yet
+| Club discovery and selection | Browse clubs and follow or unfollow favorites | In Progress | Frontend + Backend | V1; follow/unfollow API is implemented, but frontend follow controls are not built yet |
 | Club pages | Dedicated page with information and events for one club | Post-V1 | Frontend + Backend | Single-club pages are outside V1 scope |
 | Events API | Backend endpoints that serve club and event data | Implemented | Backend | |
 | Calendar export (.ics) | Download events as calendar files | Implemented | Frontend | V1 frontend export |

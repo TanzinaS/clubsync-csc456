@@ -1,10 +1,16 @@
-import { events } from '../services/data.js';
+import { directory } from '../services/data.js';
 import { dayKey, addDays, startOfWeek, formatDay, formatTime, minutesOfDay, weekEvents, groupByDay, escapeHTML as h } from '../services/directory.js';
 import { icon, categoryClass, timeline } from '../components/ui.js';
 
-export const sampleWeek = startOfWeek(dayKey(events[0]?.start_time || new Date()));
-export let activeWeek = sampleWeek;
+let sampleWeek = null;
+let activeWeek = null;
 let sampleClock = true;
+
+// Call once the directory has loaded (or failed to), so the sample week comes from the API data.
+export function initCalendar(events = directory.events) {
+  sampleWeek = activeWeek = startOfWeek(dayKey(events[0]?.start_time || new Date()));
+  sampleClock = true;
+}
 
 export function changeWeek(direction) {
   if (direction === 'today') { activeWeek = startOfWeek(dayKey(new Date())); sampleClock = false; }
@@ -13,7 +19,8 @@ export function changeWeek(direction) {
 }
 
 export function calendarPage() {
-  const items = weekEvents(events, activeWeek);
+  if (!activeWeek) initCalendar();
+  const items = weekEvents(directory.events, activeWeek);
   const dates = Array.from({ length: 7 }, (_, i) => addDays(activeWeek, i));
   const current = new Date();
   const clockDay = sampleClock ? activeWeek : dayKey(current);

@@ -16,6 +16,21 @@ export const tag = category => `<span class="tag ${categoryClass(category)}">${h
 export const logo = () => '<span class="logo-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
 export const avatar = club => `<span class="club-avatar ${categoryClass(club.category)}" aria-hidden="true">${h(club.name[0])}</span>`;
 
+// index.html ships the same markup so something is visible before the script runs.
+export const LOADING_MESSAGE = 'Loading clubs and events…';
+export const SLOW_LOADING_MESSAGE = 'Still loading. The server may be waking up, which can take up to a minute.';
+
+export const loadingState = () => `<section class="page load-state">
+    <span class="load-spinner" aria-hidden="true"></span>
+    <p id="load-status" role="status" aria-live="polite">${LOADING_MESSAGE}</p>
+  </section>`;
+
+export const loadError = () => `<section class="page load-state empty-state" role="alert">
+    <h1>We couldn’t load clubs and events</h1>
+    <p>The server didn’t respond. Check your connection, then try again.</p>
+    <button class="button dark" data-retry-load>Try again</button>
+  </section>`;
+
 export function eventCard(event) {
   return `<article class="event-card">
     <div class="event-copy">

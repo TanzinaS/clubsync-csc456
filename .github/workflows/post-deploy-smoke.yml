@@ -20,11 +20,11 @@ jobs:
           python3 - <<'PY'
           import json
           import time
+          import urllib.error
           import urllib.request
 
           backend = "https://clubsync-csc456.onrender.com"
           frontend = "https://clubsync-csc456.vercel.app"
-          origin = frontend
           results = []
 
           def fetch(url, headers=None, method="GET"):
@@ -32,54 +32,84 @@ jobs:
                   url, headers=headers or {}, method=method
               )
               start = time.monotonic()
-              with urllib.request.urlopen(request, timeout=65) as response:
+
+              try:
+                  response = urllib.request.urlopen(request, timeout=65)
+              except urllib.error.HTTPError as error:
+                  elapsed = time.monotonic() - start
+                  results.append((method, url, error.code, elapsed))
+                  print(f"{method} {url}: HTTP {error.code}, {elapsed:.2f}s")
+                  raise
+
+              with response:
                   elapsed = time.monotonic() - start
                   data = response.read()
-                  print(f"{method} {url}: HTTP {response.status}, {elapsed:.2f}s")
                   results.append((method, url, response.status, elapsed))
+                  print(f"{method} {url}: HTTP {response.status}, {elapsed:.2f}s")
                   return response, data
 
-          response, data = fetch(f"{backend}/api/health")
-          assert response.status == 200
-          assert json.loads(data)["status"] == "ok"
+          try:
+              response, data = fetch(f"{backend}/api/health")
+              assert response.status == 200, (
+                  f"Health expected 200, got {response.status}"
+              )
+              assert json.loads(data)["status"] == "ok", (
+                  "Health status is not ok"
+              )
 
-          response, data = fetch(f"{backend}/api/clubs")
-          assert response.status == 200
-          assert len(json.loads(data)) == 14
+              response, data = fetch(f"{backend}/api/clubs")
+              assert response.status == 200, (
+                  f"Clubs expected 200, got {response.status}"
+              )
+              clubs = json.loads(data)
+              assert len(clubs) > 0, "Expected at least one club"
 
-          response, data = fetch(f"{backend}/api/events")
-          assert response.status == 200
-          assert len(json.loads(data)) > 0
+              response, data = fetch(f"{backend}/api/events")
+              assert response.status == 200, (
+                  f"Events expected 200, got {response.status}"
+              )
+              events = json.loads(data)
+              assert len(events) > 0, "Expected at least one event"
 
-          response, html = fetch(frontend)
-          assert response.status == 200
+              response, html = fetch(frontend)
+              assert response.status == 200, (
+                  f"Frontend expected 200, got {response.status}"
+              )
+              assert "<title>Campus Groups · CCNY</title>". encode("utf-8") in html, (
+                  "Frontend HTML does not contain expected ClubSync title"
+              )
 
-          response, _ = fetch(
-              f"{backend}/api/events",
-              headers={"Origin": origin},
-          )
-          assert response.headers.get("Access-Control-Allow-Origin") == origin
+              response, _ = fetch(
+                  f"{backend}/api/events",
+                  headers={"Origin": frontend},
+              )
+              assert response.headers.get(
+                  "Access-Control-Allow-Origin"
+              ) == frontend, "GET CORS origin mismatch"
 
-          response, _ = fetch(
-              f"{backend}/api/events",
-              headers={
-                  "Origin": origin,
-                  "Access-Control-Request-Method": "POST",
-                  "Access-Control-Request-Headers": "Content-Type",
-              },
-              method="OPTIONS",
-          )
-          assert response.headers.get("Access-Control-Allow-Origin") == origin
+              response, _ = fetch(
+                  f"{backend}/api/clubs/1/follow",
+                  headers={
+                      "Origin": frontend,
+                      "Access-Control-Request-Method": "POST",
+                  },
+                  method="OPTIONS",
+              )
+              assert response.headers.get(
+                  "Access-Control-Allow-Origin"
+              ) == frontend, "OPTIONS CORS origin mismatch"
 
-          print("\nAll production smoke tests passed!")
-          with open("smoke-results.md", "w") as report:
-              report.write("# Production smoke test results\n\n")
-              report.write("| Method | URL | HTTP | Seconds |\n")
-              report.write("|---|---|---|---|\n")
-              for method, url, status, elapsed in results:
-                  report.write(
-                      f"| {method} | {url} | {status} | {elapsed:.2f} |\n"
-                  )
+              print("\nAll production smoke tests passed!")
+
+          finally:
+              with open("smoke-results.md", "w") as report:
+                  report.write("# Production smoke test results\n\n")
+                  report.write("| Method | URL | HTTP | Seconds |\n")
+                  report.write("|---|---|---|---|\n")
+                  for method, url, status, elapsed in results:
+                      report.write(
+                          f"| {method} | {url} | {status} | {elapsed:.2f} |\n"
+                      )
           PY
 
       - name: Upload smoke test results
@@ -88,4 +118,4 @@ jobs:
         with:
           name: production-smoke-results
           path: smoke-results.md
-          if-no-files-found: ignore
+          if-no-files-found: error

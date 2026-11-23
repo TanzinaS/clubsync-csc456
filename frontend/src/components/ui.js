@@ -1,4 +1,5 @@
 import { escapeHTML as h, formatTime, formatDay, dayKey } from '../services/directory.js';
+import { isFollowing, isFollowPending } from '../services/follows.js';
 
 const paths = {
   search: '<circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/>',
@@ -15,6 +16,44 @@ export const categoryClass = category => `category-${category.toLowerCase().repl
 export const tag = category => `<span class="tag ${categoryClass(category)}">${h(category)}</span>`;
 export const logo = () => '<span class="logo-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
 export const avatar = club => `<span class="club-avatar ${categoryClass(club.category)}" aria-hidden="true">${h(club.name[0])}</span>`;
+
+// One follow control for club cards and event details. The label stays "Follow <club>"
+// and aria-pressed carries the state. While a request runs the button gets aria-disabled
+// instead of disabled, so keyboard focus stays on it.
+export function followControl(club) {
+  const following = isFollowing(club.id);
+  return `<span class="follow-control">
+    <button class="follow-button${following ? ' following' : ''}" data-follow="${club.id}" aria-label="Follow ${h(club.name)}" aria-pressed="${following}"${isFollowPending(club.id) ? ' aria-disabled="true"' : ''}>${following ? 'Following' : 'Follow'}</button>
+    <span class="follow-error" role="status" aria-live="polite"></span>
+  </span>`;
+}
+
+export function syncFollowButtons(root = document) {
+  root.querySelectorAll('[data-follow]').forEach(button => {
+    const id = Number(button.dataset.follow);
+    const following = isFollowing(id);
+    button.setAttribute('aria-pressed', String(following));
+    button.classList.toggle('following', following);
+    button.textContent = following ? 'Following' : 'Follow';
+    if (isFollowPending(id)) button.setAttribute('aria-disabled', 'true');
+    else button.removeAttribute('aria-disabled');
+  });
+}
+
+// index.html ships the same markup so something is visible before the script runs.
+export const LOADING_MESSAGE = 'Loading clubs and events…';
+export const SLOW_LOADING_MESSAGE = 'Still loading. The server may be waking up, which can take up to a minute.';
+
+export const loadingState = () => `<section class="page load-state">
+    <span class="load-spinner" aria-hidden="true"></span>
+    <p id="load-status" role="status" aria-live="polite">${LOADING_MESSAGE}</p>
+  </section>`;
+
+export const loadError = () => `<section class="page load-state empty-state" role="alert">
+    <h1>We couldn’t load clubs and events</h1>
+    <p>The server didn’t respond. Check your connection, then try again.</p>
+    <button class="button dark" data-retry-load>Try again</button>
+  </section>`;
 
 export function eventCard(event) {
   return `<article class="event-card">
@@ -40,7 +79,7 @@ export function eventDetail(event) {
   return `<button class="icon-button dialog-close" data-close aria-label="Close event details">${icon('close')}</button>
     ${tag(event.category)}
     <h2 id="dialog-title">${h(event.title)}</h2>
-    <p class="club-byline">${avatar(event.club)} By ${h(event.club.name)}</p>
+    <div class="detail-club"><p class="club-byline">${avatar(event.club)} By ${h(event.club.name)}</p>${followControl(event.club)}</div>
     <div class="detail-info"><p>${icon('calendar')}<span>${formatDay(dayKey(event.start_time), { weekday: 'long', month: 'long', day: 'numeric' })}<br>${formatTime(event.start_time)} – ${formatTime(event.end_time)} ET</span></p>
     <p>${icon('pin')} ${h(event.location)}</p></div>
     <p class="detail-description">${h(event.description)}</p>

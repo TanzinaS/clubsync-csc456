@@ -103,10 +103,16 @@ class TestAPIContract(unittest.TestCase):
         self.assert_event_contract(response.get_json())
 
     def test_personalized_events_contract(self):
-        # Follow club 6 so the response contains an event
+        # No followed clubs should return an empty list
+        response = self.client.get("/api/events/personalized")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), [])
+
+        # Follow club 6
         follow_response = self.client.post("/api/clubs/6/follow")
         self.assertEqual(follow_response.status_code, 200)
 
+        # Get personalized events
         response = self.client.get("/api/events/personalized")
         self.assertEqual(response.status_code, 200)
 
@@ -115,8 +121,18 @@ class TestAPIContract(unittest.TestCase):
         self.assertIs(type(events), list)
         self.assertGreater(len(events), 0)
 
+        # Compare with all events belonging to followed club 6.
+        # This verifies filtering and ordering.
+        expected_response = self.client.get(
+            "/api/events?club_id=6"
+        )
+        self.assertEqual(expected_response.status_code, 200)
+
+        self.assertEqual(events, expected_response.get_json())
+
         for event in events:
             self.assert_event_contract(event)
+
 
     def test_follow_club_contract(self):
         response = self.client.post("/api/clubs/6/follow")
@@ -164,6 +180,21 @@ class TestAPIContract(unittest.TestCase):
         # Check expected values
         self.assertEqual(health["status"], "ok")
         self.assertEqual(health["service"], "ClubSync Backend")
+
+
+    def test_get_all_events_contract(self):
+        response = self.client.get("/api/events")
+
+        self.assertEqual(response.status_code, 200)
+
+        events = response.get_json()
+
+        self.assertIs(type(events), list)
+        self.assertGreater(len(events), 0)
+
+        for event in events:
+            self.assert_event_contract(event)
+
 
 
 if __name__ == "__main__":

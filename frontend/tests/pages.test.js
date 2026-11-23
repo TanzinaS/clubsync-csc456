@@ -26,7 +26,8 @@ vi.mock('../src/services/api.js', async importOriginal => {
   return {
     ...(await importOriginal()),
     getClubs: vi.fn(async () => clubs),
-    getEvents: vi.fn(async () => events)
+    getEvents: vi.fn(async () => events),
+    getMe: vi.fn(async () => ({ id: 1, name: 'Demo User', followed_clubs: [] }))
   };
 });
 

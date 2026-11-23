@@ -38,6 +38,7 @@ yarn-error.log*
 dist/
 build/
 coverage/
+.lighthouseci/
 
 # ---- Logs and local databases ----
 *.log

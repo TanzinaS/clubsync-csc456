@@ -1,4 +1,6 @@
-
+# Tests the response shapes of V1 API endpoints.
+# Error cases are covered in test_json_errors.py,
+# test_club_following.py, and test_event_endpoints.py.
 import sys
 import unittest
 from pathlib import Path

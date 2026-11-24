@@ -2,7 +2,7 @@
 .env
 .env.*
 !.env.example
-# Public, non-secret build config for the frontend (the deployed API origin).
+# Public, non-secret build config for the frontend (the deployed API origin and the Sentry DSN).
 !frontend/.env.production
 *.pem
 *.key

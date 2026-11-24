@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+# Public, non-secret build config for the frontend (the deployed API origin and the Sentry DSN).
+!frontend/.env.production
 *.pem
 *.key
 credentials*.json
@@ -25,6 +27,7 @@ venv/
 .venv/
 env/
 .pytest_cache/
+.coverage
 
 # ---- JavaScript / Node (if used) ----
 node_modules/
@@ -35,8 +38,13 @@ yarn-error.log*
 dist/
 build/
 coverage/
+.lighthouseci/
 
 # ---- Logs and local databases ----
 *.log
 *.sqlite3
 *.db
+
+# ---- Playwright test output ----
+playwright-report/
+test-results/

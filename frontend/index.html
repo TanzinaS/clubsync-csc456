@@ -11,7 +11,13 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header id="header" class="site-header"></header>
-    <main id="main" tabindex="-1"></main>
+    <main id="main" tabindex="-1">
+      <!-- Same markup as loadingState() in src/components/ui.js, so the page isn't blank while the script and API load. -->
+      <section class="page load-state">
+        <span class="load-spinner" aria-hidden="true"></span>
+        <p id="load-status" role="status" aria-live="polite">Loading clubs and events…</p>
+      </section>
+    </main>
     <dialog id="event-dialog" aria-labelledby="dialog-title"></dialog>
     <script type="module" src="/src/main.js"></script>
   </body>

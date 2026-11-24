@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { eventsPage, eventResults, isUpcoming, updateEventResults } from '../src/pages/events.js';
-import { calendarPage, initCalendar } from '../src/pages/calendar.js';
+import { calendarPage, changeWeek, initCalendar } from '../src/pages/calendar.js';
 import { directory, loadDirectory } from '../src/services/data.js';
 import { CATEGORIES, prepareDirectory, weekEvents } from '../src/services/directory.js';
 
@@ -37,6 +37,7 @@ describe('upcoming events feed', () => {
     { id: 11, club_id: 6, title: 'Ongoing Build Night', description: 'Now.', start_time: '2026-11-16T11:00:00-05:00', end_time: '2026-11-16T15:00:00-05:00', location: 'Marshak 418', tags: ['Tech'] },
     { id: 12, club_id: 1, title: 'Later Puzzle Hour', description: 'Soon.', start_time: '2026-11-18T12:00:00-05:00', end_time: '2026-11-18T13:00:00-05:00', location: 'NAC 4/120', tags: ['Academic'] },
   ]);
+
   // 12:00 PM in New York on Mon, Nov 16, 2026: event 10 has ended, event 11 is in progress.
   const now = new Date('2026-11-16T17:00:00Z');
   const noFilters = { search: '', category: 'All', club: 'all' };
@@ -92,18 +93,24 @@ describe('upcoming events feed', () => {
     const readData = name => JSON.parse(readFileSync(new URL(`../../data/${name}.json`, import.meta.url), 'utf8'));
     const apiData = { '/api/clubs': readData('sample_clubs'), '/api/events': readData('sample_events') };
     let elements;
+
     beforeEach(async () => {
       vi.stubEnv('VITE_API_BASE_URL', 'https://clubsync-api.example');
       vi.stubGlobal('fetch', vi.fn(async url => new Response(JSON.stringify(apiData[new URL(url).pathname]), {
         status: 200, headers: { 'Content-Type': 'application/json' },
       })));
+
       // Wait for the shared directory to load before any page reads it.
       await loadDirectory();
-      initCalendar();
+
       vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-11-24T12:00:00-05:00'));
+      initCalendar();
+
       elements = { '#events-count': {}, '#events-results': {} };
       vi.stubGlobal('document', { querySelector: selector => elements[selector], querySelectorAll: () => [] });
     });
+
     afterEach(() => {
       vi.useRealTimers();
       vi.unstubAllGlobals();
@@ -117,12 +124,76 @@ describe('upcoming events feed', () => {
       expect(directory.events).toHaveLength(12);
     });
 
-    it('updates the feed from the current time while the calendar keeps past events', () => {
-      vi.setSystemTime(new Date('2026-11-24T12:00:00-05:00'));
+    it('updates the feed from the current time while the calendar can still show past events', () => {
       updateEventResults(noFilters);
 
       expect(elements['#events-count'].textContent).toBe('6 upcoming events');
-      expect(calendarPage()).toContain('5 events · Mon, Nov 16 to Sun, Nov 22');
+
+      // The calendar starts on the current week, but previous weeks remain accessible.
+      expect(calendarPage()).toContain('Mon, Nov 23 to Sun, Nov 29');
+
+      changeWeek(-1);
+
+      expect(calendarPage()).toContain('Mon, Nov 16 to Sun, Nov 22');
+      expect(calendarPage()).toContain('data-event="1"');
+    });
+
+    it('supports previous, next, and Today calendar navigation', () => {
+      expect(calendarPage()).toContain('Mon, Nov 23 to Sun, Nov 29');
+
+      changeWeek(-1);
+      expect(calendarPage()).toContain('Mon, Nov 16 to Sun, Nov 22');
+
+      changeWeek(1);
+      expect(calendarPage()).toContain('Mon, Nov 23 to Sun, Nov 29');
+
+      changeWeek(1);
+      expect(calendarPage()).toContain('Mon, Nov 30 to Sun, Dec 6');
+
+      changeWeek('today');
+      expect(calendarPage()).toContain('Mon, Nov 23 to Sun, Nov 29');
+    });
+
+    it('jumps from an empty week to the next upcoming event and hides the CTA when none remain', () => {
+      const originalEvents = directory.events;
+
+      const pastEvent = {
+        id: 90,
+        title: 'Past event',
+        category: 'Social',
+        start_time: '2026-11-16T10:00:00-05:00',
+        end_time: '2026-11-16T11:00:00-05:00',
+        location: 'NAC',
+      };
+
+      const nextEvent = {
+        id: 91,
+        title: 'Next event',
+        category: 'Social',
+        start_time: '2026-12-02T10:00:00-05:00',
+        end_time: '2026-12-02T11:00:00-05:00',
+        location: 'NAC',
+      };
+
+      try {
+        directory.events = [pastEvent, nextEvent];
+        initCalendar();
+
+        expect(calendarPage()).toContain('Go to next event');
+
+        changeWeek('next-event');
+
+        expect(calendarPage()).toContain('Mon, Nov 30 to Sun, Dec 6');
+        expect(calendarPage()).toContain('data-event="91"');
+
+        directory.events = [pastEvent];
+        initCalendar();
+
+        expect(calendarPage()).not.toContain('Go to next event');
+      } finally {
+        directory.events = originalEvents;
+        initCalendar();
+      }
     });
   });
 });

@@ -1,0 +1,149 @@
+
+name: Post-deploy Smoke Tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    name: Check Render and Vercel
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Check production services
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import time
+          import urllib.error
+          import urllib.request
+
+          backend = "https://clubsync-csc456.onrender.com"
+          frontend = "https://clubsync-csc456.vercel.app"
+          results = []
+
+
+          def fetch(url, headers=None, method="GET"):
+              request = urllib.request.Request(
+                  url, headers=headers or {}, method=method
+              )
+
+              max_attempts = 4
+
+              for attempt in range(1, max_attempts + 1):
+                  start = time.monotonic()
+
+                  try:
+                      response = urllib.request.urlopen(request, timeout=65)
+
+                  except urllib.error.HTTPError as error:
+                      elapsed = time.monotonic() - start
+                      results.append((method, url, error.code, elapsed))
+                      print(f"{method} {url}: HTTP {error.code}, {elapsed:.2f}s")
+
+                      if error.code not in (408, 429, 500, 502, 503, 504):
+                          raise
+                      if attempt == max_attempts:
+                          raise
+
+                      delay = 5 * (2 ** (attempt - 1))
+                      print(f"Retrying in {delay}s (attempt {attempt + 1}/{max_attempts})...")
+                      time.sleep(delay)
+
+                  except (urllib.error.URLError, TimeoutError) as error:
+                      elapsed = time.monotonic() - start
+                      results.append((method, url, "NETWORK ERROR", elapsed))
+                      print(f"{method} {url}: Network error: {error}")
+
+                      if attempt == max_attempts:
+                          raise
+
+                      delay = 5 * (2 ** (attempt - 1))
+                      print(f"Retrying in {delay}s (attempt {attempt + 1}/{max_attempts})...")
+                      time.sleep(delay)
+
+                  else:
+                      with response:
+                          elapsed = time.monotonic() - start
+                          data = response.read()
+                          results.append((method, url, response.status, elapsed))
+                          print(f"{method} {url}: HTTP {response.status}, {elapsed:.2f}s")
+                          return response, data
+
+
+          try:
+              response, data = fetch(f"{backend}/api/health")
+              assert response.status == 200, (
+                  f"Health expected 200, got {response.status}"
+              )
+              assert json.loads(data)["status"] == "ok", (
+                  "Health status is not ok"
+              )
+
+              response, data = fetch(f"{backend}/api/clubs")
+              assert response.status == 200, (
+                  f"Clubs expected 200, got {response.status}"
+              )
+              clubs = json.loads(data)
+              assert len(clubs) > 0, "Expected at least one club"
+
+              response, data = fetch(f"{backend}/api/events")
+              assert response.status == 200, (
+                  f"Events expected 200, got {response.status}"
+              )
+              events = json.loads(data)
+              assert len(events) > 0, "Expected at least one event"
+
+              response, html = fetch(frontend)
+              assert response.status == 200, (
+                  f"Frontend expected 200, got {response.status}"
+              )
+              assert "<title>Campus Groups · CCNY</title>". encode("utf-8") in html, (
+                  "Frontend HTML does not contain expected ClubSync title"
+              )
+
+              response, _ = fetch(
+                  f"{backend}/api/events",
+                  headers={"Origin": frontend},
+              )
+              assert response.headers.get(
+                  "Access-Control-Allow-Origin"
+              ) == frontend, "GET CORS origin mismatch"
+
+              response, _ = fetch(
+                  f"{backend}/api/clubs/1/follow",
+                  headers={
+                      "Origin": frontend,
+                      "Access-Control-Request-Method": "POST",
+                  },
+                  method="OPTIONS",
+              )
+              assert response.headers.get(
+                  "Access-Control-Allow-Origin"
+              ) == frontend, "OPTIONS CORS origin mismatch"
+
+              print("\nAll production smoke tests passed!")
+
+          finally:
+              with open("smoke-results.md", "w") as report:
+                  report.write("# Production smoke test results\n\n")
+                  report.write("| Method | URL | HTTP | Seconds |\n")
+                  report.write("|---|---|---|---|\n")
+                  for method, url, status, elapsed in results:
+                      report.write(
+                          f"| {method} | {url} | {status} | {elapsed:.2f} |\n"
+                      )
+          PY
+
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-smoke-results
+          path: smoke-results.md
+          if-no-files-found: error

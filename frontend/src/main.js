@@ -1,3 +1,5 @@
+// Load Sentry first so it can catch errors from every other module.
+import './instrument.js';
 import './styles/main.css';
 import { directory, loadDirectory } from './services/data.js';
 import { calendarFile } from './services/directory.js';

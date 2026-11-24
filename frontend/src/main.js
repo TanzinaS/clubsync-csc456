@@ -1,7 +1,10 @@
+// Load Sentry first so it can catch errors from every other module.
+import './instrument.js';
 import './styles/main.css';
 import { directory, loadDirectory } from './services/data.js';
 import { calendarFile } from './services/directory.js';
-import { logo, eventDetail, loadingState, loadError, LOADING_MESSAGE, SLOW_LOADING_MESSAGE } from './components/ui.js';
+import { logo, eventDetail, loadingState, loadError, syncFollowButtons, LOADING_MESSAGE, SLOW_LOADING_MESSAGE } from './components/ui.js';
+import { loadFollows, onFollowChange, toggleFollow } from './services/follows.js';
 import { withRetry } from './services/retry.js';
 import { homePage } from './pages/home.js';
 import { eventsPage, eventFilters, updateEventResults } from './pages/events.js';
@@ -49,6 +52,21 @@ function syncFilters() {
   updateEventResults(filters);
 }
 
+// A failed follow keeps the previous state and shows the error next to the clicked button.
+async function handleFollow(button) {
+  const error = button.closest('.follow-control').querySelector('.follow-error');
+  error.textContent = '';
+  try {
+    await toggleFollow(Number(button.dataset.follow));
+  } catch (failure) {
+    console.error('Could not update the follow.', failure);
+    error.textContent = 'Couldn’t update. Try again.';
+  }
+}
+
+// Keeps every follow button on screen (club cards and event details) in sync with the shared state.
+onFollowChange(() => syncFollowButtons());
+
 function authNotice(google = false) {
   const message = document.querySelector('#auth-message');
   message.hidden = false;
@@ -68,6 +86,7 @@ document.addEventListener('click', event => {
     dialog.showModal();
   }
   if (target.hasAttribute('data-close')) dialog.close();
+  if (target.dataset.follow) handleFollow(target);
   if (target.dataset.download) {
     const item = directory.events.find(e => e.id === Number(target.dataset.download));
     const url = URL.createObjectURL(new Blob([calendarFile(item)], { type: 'text/calendar;charset=utf-8' }));
@@ -113,6 +132,14 @@ dialog.addEventListener('click', event => { if (event.target === dialog && (even
 // Keep the live indicator current after choosing Today, without closing an open event.
 setInterval(() => { if (currentRoute === '/calendar' && !dialog.open && !document.activeElement?.matches('button, a, input, select')) main.innerHTML = calendarPage(); }, 60_000);
 
+// Follows come from GET /api/me, so they survive a page refresh. They are not needed to
+// browse, so they load next to the directory with their own retries and never block it.
+// Until they arrive, or if they never do, every club shows as not followed, and
+// onFollowChange() updates the buttons as soon as they land.
+function loadFollowsQuietly() {
+  withRetry(loadFollows).catch(error => console.error('Could not load followed clubs. Showing every club as not followed.', error));
+}
+
 // Shows the loading state, retries failed loads with backoff, and falls back to an error
 // with a Try again button. Used on startup and by that button, without a page reload.
 async function loadAndRender() {
@@ -124,6 +151,7 @@ async function loadAndRender() {
     if (status) status.textContent = slow || retries ? `${SLOW_LOADING_MESSAGE}${retries}` : LOADING_MESSAGE;
   };
   const slowTimer = setTimeout(() => { slow = true; showStatus(); }, SLOW_LOAD_MS);
+  loadFollowsQuietly();
   try {
     await withRetry(loadDirectory, { onRetry: ({ retry, of }) => { retries = ` Retrying (${retry} of ${of}).`; showStatus(); } });
   } catch (error) {

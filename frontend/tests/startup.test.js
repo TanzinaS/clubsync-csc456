@@ -24,6 +24,7 @@ vi.mock('../src/services/api.js', async importOriginal => {
     ...real,
     getClubs: vi.fn(() => { clubsCalls.push(Date.now()); return queue.shift()(); }),
     getEvents: vi.fn(async () => events),
+    getMe: vi.fn(async () => ({ id: 1, name: 'Demo User', followed_clubs: [] })),
   };
 });
 

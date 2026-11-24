@@ -27,6 +27,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
@@ -125,25 +126,36 @@ describe('calendar startup', () => {
     expect(events).not.toHaveBeenCalled();
   });
 
-  it('opens on the first loaded event week once initialized', async () => {
+  it('opens on the current week, not the first loaded event week', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-23T12:00:00-05:00'));
+
     mockApi();
     const { loadDirectory } = await importData();
     const { calendarPage, initCalendar } = await import('../src/pages/calendar.js');
 
     await loadDirectory();
     initCalendar();
+
     const html = calendarPage();
-    expect(html).toContain('5 events · Mon, Nov 16 to Sun, Nov 22');
-    expect(html).toContain('data-event="1"');
+
+    expect(html).toContain('Mon, Nov 23 to Sun, Nov 29');
+    expect(html).not.toContain('Sample week');
+    expect(html).not.toContain('Preview time');
+    expect(html).toContain('All times Eastern');
   });
 
   it('renders an empty current week, without crashing, when the load failed', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-23T12:00:00-05:00'));
+
     mockApi({ status: { clubs: 500 } });
     const { loadDirectory } = await importData();
     const { calendarPage, initCalendar } = await import('../src/pages/calendar.js');
 
     await expect(loadDirectory()).rejects.toThrow();
     initCalendar();
+
     expect(calendarPage()).toContain('0 events');
   });
 });
@@ -166,3 +178,4 @@ describe('pages before or without data', () => {
     expect(eventsPage(new URLSearchParams({ club: '6' }))).toContain('<option value="6" selected>Robotics Club</option>');
   });
 });
+
